@@ -2,7 +2,10 @@
   "order": 7,
   "featured": false,
   "nda": "none",
-  "title": { "en": "SAM 3 Auto-Labelling Tool", "ar": "أداة وسم تلقائي باستخدام SAM 3" },
+  "title": {
+    "en": "SAM 3 Auto-Labelling Tool",
+    "ar": "أداة وسم تلقائي باستخدام SAM 3"
+  },
   "summary": {
     "en": "A text-prompted labeller that turns a folder or ZIP of images into a ready YOLO dataset with SAM 3, as a desktop app and a web app.",
     "ar": "أداة وسم بالمُوجِّهات النصية تحوّل مجلداً أو ملف ZIP من الصور إلى مجموعة بيانات YOLO جاهزة باستخدام SAM 3، كتطبيق سطح مكتب وتطبيق ويب."
@@ -12,18 +15,59 @@
     "ar": "الوسم اليدوي للصناديق والأقنعة هو عنق الزجاجة عند بناء مجموعات بيانات كشف جديدة."
   },
   "approach": [
-    { "en": "Text prompts drive SAM 3 (via Transformers) to segment each concept, and masks are converted to YOLO boxes and polygons.", "ar": "المُوجِّهات النصية تقود SAM 3 (عبر Transformers) لتقطيع كل مفهوم، ثم تُحوَّل الأقنعة إلى صناديق ومضلعات YOLO." },
-    { "en": "Input is a folder or ZIP; output is a ready-to-train YOLO dataset.", "ar": "المدخل مجلد أو ملف ZIP، والمخرج مجموعة بيانات YOLO جاهزة للتدريب." },
-    { "en": "Ships as a PyQt6 desktop app and as a Dockerised web app (FastAPI + React) with a GPU Celery worker.", "ar": "يأتي كتطبيق سطح مكتب PyQt6 وكتطبيق ويب داخل Docker (FastAPI + React) مع عامل Celery على GPU." }
+    {
+      "en": "Text prompts drive SAM 3 (via Transformers) to segment each concept, and masks are converted to YOLO boxes and polygons.",
+      "ar": "المُوجِّهات النصية تقود SAM 3 (عبر Transformers) لتقطيع كل مفهوم، ثم تُحوَّل الأقنعة إلى صناديق ومضلعات YOLO."
+    },
+    {
+      "en": "Input is a folder or ZIP; output is a ready-to-train YOLO dataset.",
+      "ar": "المدخل مجلد أو ملف ZIP، والمخرج مجموعة بيانات YOLO جاهزة للتدريب."
+    },
+    {
+      "en": "Ships as a PyQt6 desktop app and as a Dockerised web app (FastAPI + React) with a GPU Celery worker.",
+      "ar": "يأتي كتطبيق سطح مكتب PyQt6 وكتطبيق ويب داخل Docker (FastAPI + React) مع عامل Celery على GPU."
+    }
   ],
   "pipeline": [
-    { "en": "Folder / ZIP of images", "ar": "مجلد / ZIP صور" },
-    { "en": "Text prompts", "ar": "مُوجِّهات نصية" },
-    { "en": "SAM 3 segmentation", "ar": "تقطيع SAM 3" },
-    { "en": "Mask → box / polygon", "ar": "قناع ← صندوق / مضلع" },
-    { "en": "YOLO dataset", "ar": "مجموعة بيانات YOLO" }
+    {
+      "en": "Folder / ZIP of images",
+      "ar": "مجلد / ZIP صور"
+    },
+    {
+      "en": "Text prompts",
+      "ar": "مُوجِّهات نصية"
+    },
+    {
+      "en": "SAM 3 segmentation",
+      "ar": "تقطيع SAM 3"
+    },
+    {
+      "en": "Mask → box / polygon",
+      "ar": "قناع ← صندوق / مضلع"
+    },
+    {
+      "en": "YOLO dataset",
+      "ar": "مجموعة بيانات YOLO"
+    }
   ],
-  "stack": ["SAM 3", "Transformers", "PyQt6", "FastAPI", "Celery", "React", "Docker"],
+  "stack": [
+    "SAM 3",
+    "Transformers",
+    "PyQt6",
+    "FastAPI",
+    "Celery",
+    "React",
+    "Docker"
+  ],
   "metrics": [],
-  "repo": null
+  "repo": null,
+  "media": [
+    {
+      "src": "/images/projects/sam3-autolabel.webp",
+      "alt": {
+        "en": "Illustration: images with SAM 3 masks converted to YOLO label files",
+        "ar": "رسم توضيحي: صور بأقنعة SAM 3 تتحوّل إلى ملفات تسميات YOLO"
+      }
+    }
+  ]
 }

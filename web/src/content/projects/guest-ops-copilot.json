@@ -2,7 +2,10 @@
   "order": 5,
   "featured": false,
   "nda": "light",
-  "title": { "en": "Multi-Agent Guest-Operations Copilot (MVP)", "ar": "مساعد عمليات الضيوف متعدد الوكلاء (نموذج أولي)" },
+  "title": {
+    "en": "Multi-Agent Guest-Operations Copilot (MVP)",
+    "ar": "مساعد عمليات الضيوف متعدد الوكلاء (نموذج أولي)"
+  },
   "summary": {
     "en": "Five ADK agents handle each guest message inside a durable Temporal workflow that waits for human approval, with a deterministic gate that can only make outcomes stricter.",
     "ar": "خمسة وكلاء ADK يعالجون كل رسالة ضيف داخل سير عمل Temporal متين ينتظر موافقة بشرية، مع بوابة قرار حتمية لا تستطيع إلا تشديد النتيجة."
@@ -12,22 +15,80 @@
     "ar": "تخلط رسائل الضيوف بين الحجوزات وأسئلة السياسات ومشكلات سلامة حقيقية، ونموذج لغوي واحد قد يختلق الحقائق أو يوافق على ما يجب تصعيده."
   },
   "approach": [
-    { "en": "Five agents (orchestrator, reservation, policy, response, review/safety) inside a durable Temporal workflow that pauses for human approval.", "ar": "خمسة وكلاء (المنسّق، والحجوزات، والسياسات، والرد، والمراجعة/السلامة) داخل سير عمل Temporal متين يتوقف لانتظار الموافقة البشرية." },
-    { "en": "Facts come only from tool results, never from model text.", "ar": "الحقائق تأتي من نتائج الأدوات فقط، لا من نص النموذج." },
-    { "en": "A deterministic decision gate that can only make outcomes stricter. In testing it escalated a gas-leak report that a real LLM reviewer had approved.", "ar": "بوابة قرار حتمية لا تستطيع إلا تشديد النتيجة. في الاختبار صعّدت بلاغاً عن تسرّب غاز كان مراجِع LLM حقيقي قد وافق عليه." },
-    { "en": "Offline agent evals, idempotent ingestion, and switchable providers (Gemini, Cohere, OpenRouter) via LiteLLM.", "ar": "تقييمات غير متصلة للوكلاء، واستقبال رسائل خالٍ من التكرار، ومزوّدون قابلون للتبديل (Gemini وCohere وOpenRouter) عبر LiteLLM." }
+    {
+      "en": "Five agents (orchestrator, reservation, policy, response, review/safety) inside a durable Temporal workflow that pauses for human approval.",
+      "ar": "خمسة وكلاء (المنسّق، والحجوزات، والسياسات، والرد، والمراجعة/السلامة) داخل سير عمل Temporal متين يتوقف لانتظار الموافقة البشرية."
+    },
+    {
+      "en": "Facts come only from tool results, never from model text.",
+      "ar": "الحقائق تأتي من نتائج الأدوات فقط، لا من نص النموذج."
+    },
+    {
+      "en": "A deterministic decision gate that can only make outcomes stricter. In testing it escalated a gas-leak report that a real LLM reviewer had approved.",
+      "ar": "بوابة قرار حتمية لا تستطيع إلا تشديد النتيجة. في الاختبار صعّدت بلاغاً عن تسرّب غاز كان مراجِع LLM حقيقي قد وافق عليه."
+    },
+    {
+      "en": "Offline agent evals, idempotent ingestion, and switchable providers (Gemini, Cohere, OpenRouter) via LiteLLM.",
+      "ar": "تقييمات غير متصلة للوكلاء، واستقبال رسائل خالٍ من التكرار، ومزوّدون قابلون للتبديل (Gemini وCohere وOpenRouter) عبر LiteLLM."
+    }
   ],
   "pipeline": [
-    { "en": "Guest message", "ar": "رسالة الضيف" },
-    { "en": "Orchestrator agent", "ar": "وكيل المنسّق" },
-    { "en": "Reservation / policy agents (tools)", "ar": "وكلاء الحجوزات / السياسات (أدوات)" },
-    { "en": "Response agent", "ar": "وكيل الرد" },
-    { "en": "Review/safety + decision gate", "ar": "المراجعة/السلامة + بوابة القرار" },
-    { "en": "Human approval", "ar": "موافقة بشرية" }
+    {
+      "en": "Guest message",
+      "ar": "رسالة الضيف"
+    },
+    {
+      "en": "Orchestrator agent",
+      "ar": "وكيل المنسّق"
+    },
+    {
+      "en": "Reservation / policy agents (tools)",
+      "ar": "وكلاء الحجوزات / السياسات (أدوات)"
+    },
+    {
+      "en": "Response agent",
+      "ar": "وكيل الرد"
+    },
+    {
+      "en": "Review/safety + decision gate",
+      "ar": "المراجعة/السلامة + بوابة القرار"
+    },
+    {
+      "en": "Human approval",
+      "ar": "موافقة بشرية"
+    }
   ],
-  "stack": ["Google ADK", "Temporal", "LiteLLM", "FastAPI", "PostgreSQL", "React"],
+  "stack": [
+    "Google ADK",
+    "Temporal",
+    "LiteLLM",
+    "FastAPI",
+    "PostgreSQL",
+    "React"
+  ],
   "metrics": [
-    { "label": { "en": "Agents", "ar": "الوكلاء" }, "value": "5" },
-    { "label": { "en": "LLM providers (switchable)", "ar": "مزوّدون قابلون للتبديل" }, "value": "3" }
+    {
+      "label": {
+        "en": "Agents",
+        "ar": "الوكلاء"
+      },
+      "value": "5"
+    },
+    {
+      "label": {
+        "en": "LLM providers (switchable)",
+        "ar": "مزوّدون قابلون للتبديل"
+      },
+      "value": "3"
+    }
+  ],
+  "media": [
+    {
+      "src": "/images/projects/guest-ops-copilot.webp",
+      "alt": {
+        "en": "Illustration: five-agent graph with a decision gate and human approval",
+        "ar": "رسم توضيحي: شبكة الوكلاء الخمسة مع بوابة القرار والموافقة البشرية"
+      }
+    }
   ]
 }

@@ -2,7 +2,10 @@
   "order": 4,
   "featured": false,
   "nda": "full",
-  "title": { "en": "VLM Inspection-Rule Extractor", "ar": "مستخرج قواعد الفحص بنماذج الرؤية واللغة" },
+  "title": {
+    "en": "VLM Inspection-Rule Extractor",
+    "ar": "مستخرج قواعد الفحص بنماذج الرؤية واللغة"
+  },
   "summary": {
     "en": "Turns engineering-standard PDFs into atomic, citation-backed inspection rules, each a yes/no question a VLM can check against a site photo.",
     "ar": "يحوّل ملفات PDF للمعايير الهندسية إلى قواعد فحص ذرّية موثّقة بالاقتباسات، كل منها سؤال نعم/لا يستطيع نموذج الرؤية التحقق منه على صورة من الموقع."
@@ -12,21 +15,81 @@
     "ar": "معايير الفحص مدفونة في معايير طويلة حرة الصياغة. تحويلها يدوياً إلى قواعد قابلة للتحقق بطيء، والنماذج اللغوية تختلق الاقتباسات، وإعادة تشغيل الدفعات الطويلة بعد تعطّل أحد العمّال مكلفة."
   },
   "approach": [
-    { "en": "Multi-pass extraction (index, batched extraction, duplicate sweep, verification) runs as Temporal workflows, so a crashed worker resumes without re-paying for finished batches.", "ar": "استخراج متعدد المراحل (فهرسة، واستخراج على دفعات، وإزالة التكرار، وتحقق) كسير عمل Temporal، فيستأنف العامل المتعطّل دون إعادة دفع ثمن الدفعات المنجزة." },
-    { "en": "Every cited quote is string-matched against its source page, so a rule cannot cite text that is not there.", "ar": "كل اقتباس يُطابَق نصياً مع صفحته المصدر، فلا يمكن لقاعدة أن تستشهد بنص غير موجود." },
-    { "en": "Versioned prompts and extraction profiles, cost estimates from the live OpenRouter catalogue, and LLM-as-judge comparison across runs.", "ar": "مُوجِّهات وملفات استخراج بإصدارات، وتقدير التكلفة من كتالوج OpenRouter المباشر، ومقارنة التشغيلات بأسلوب LLM-as-judge." }
+    {
+      "en": "Multi-pass extraction (index, batched extraction, duplicate sweep, verification) runs as Temporal workflows, so a crashed worker resumes without re-paying for finished batches.",
+      "ar": "استخراج متعدد المراحل (فهرسة، واستخراج على دفعات، وإزالة التكرار، وتحقق) كسير عمل Temporal، فيستأنف العامل المتعطّل دون إعادة دفع ثمن الدفعات المنجزة."
+    },
+    {
+      "en": "Every cited quote is string-matched against its source page, so a rule cannot cite text that is not there.",
+      "ar": "كل اقتباس يُطابَق نصياً مع صفحته المصدر، فلا يمكن لقاعدة أن تستشهد بنص غير موجود."
+    },
+    {
+      "en": "Versioned prompts and extraction profiles, cost estimates from the live OpenRouter catalogue, and LLM-as-judge comparison across runs.",
+      "ar": "مُوجِّهات وملفات استخراج بإصدارات، وتقدير التكلفة من كتالوج OpenRouter المباشر، ومقارنة التشغيلات بأسلوب LLM-as-judge."
+    }
   ],
   "pipeline": [
-    { "en": "Standard PDF (PyMuPDF)", "ar": "PDF المعيار (PyMuPDF)" },
-    { "en": "Index pass", "ar": "مرحلة الفهرسة" },
-    { "en": "Batched extraction", "ar": "استخراج على دفعات" },
-    { "en": "Duplicate sweep", "ar": "إزالة التكرار" },
-    { "en": "Verification + quote matching", "ar": "تحقق + مطابقة الاقتباسات" },
-    { "en": "Yes/no inspection rules", "ar": "قواعد فحص نعم/لا" }
+    {
+      "en": "Standard PDF (PyMuPDF)",
+      "ar": "PDF المعيار (PyMuPDF)"
+    },
+    {
+      "en": "Index pass",
+      "ar": "مرحلة الفهرسة"
+    },
+    {
+      "en": "Batched extraction",
+      "ar": "استخراج على دفعات"
+    },
+    {
+      "en": "Duplicate sweep",
+      "ar": "إزالة التكرار"
+    },
+    {
+      "en": "Verification + quote matching",
+      "ar": "تحقق + مطابقة الاقتباسات"
+    },
+    {
+      "en": "Yes/no inspection rules",
+      "ar": "قواعد فحص نعم/لا"
+    }
   ],
-  "stack": ["Temporal", "OpenRouter", "PyMuPDF", "PostgreSQL", "Alembic", "React", "LLM-as-judge"],
+  "stack": [
+    "Temporal",
+    "OpenRouter",
+    "PyMuPDF",
+    "PostgreSQL",
+    "Alembic",
+    "React",
+    "LLM-as-judge"
+  ],
   "metrics": [
-    { "label": { "en": "Extraction passes", "ar": "مراحل الاستخراج" }, "value": "4" },
-    { "label": { "en": "Quotes verified against source", "ar": "اقتباسات متحقَّق منها" }, "value": "100%", "note": { "en": "string-matched per page", "ar": "مطابقة نصية لكل صفحة" } }
+    {
+      "label": {
+        "en": "Extraction passes",
+        "ar": "مراحل الاستخراج"
+      },
+      "value": "4"
+    },
+    {
+      "label": {
+        "en": "Quotes verified against source",
+        "ar": "اقتباسات متحقَّق منها"
+      },
+      "value": "100%",
+      "note": {
+        "en": "string-matched per page",
+        "ar": "مطابقة نصية لكل صفحة"
+      }
+    }
+  ],
+  "media": [
+    {
+      "src": "/images/projects/vlm-rule-extractor.webp",
+      "alt": {
+        "en": "Illustration: standard pages with a matched quote feeding yes/no inspection rules",
+        "ar": "رسم توضيحي: صفحات معيار مع اقتباس متطابق يغذّي قواعد فحص نعم/لا"
+      }
+    }
   ]
 }

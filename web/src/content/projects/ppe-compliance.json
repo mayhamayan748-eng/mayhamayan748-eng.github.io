@@ -2,7 +2,10 @@
   "order": 2,
   "featured": true,
   "nda": "full",
-  "title": { "en": "Real-time PPE Compliance Monitoring", "ar": "مراقبة الالتزام بمعدات السلامة في الزمن الحقيقي" },
+  "title": {
+    "en": "Real-time PPE Compliance Monitoring",
+    "ar": "مراقبة الالتزام بمعدات السلامة في الزمن الحقيقي"
+  },
   "summary": {
     "en": "A crop-then-detect pipeline that flags missing safety equipment in live and uploaded video and identifies violators, built around a strict false-alarm budget.",
     "ar": "خط معالجة يقتطع ثم يكشف، يرصد غياب معدات السلامة في البث المباشر والفيديو المرفوع ويتعرّف على المخالفين، مع ميزانية صارمة للإنذارات الكاذبة."
@@ -12,25 +15,111 @@
     "ar": "كشف العمال الذين لا يرتدون معدات السلامة المطلوبة في بث الكاميرات. كل إنذار كاذب يُفقد المشغّل ثقته بالنظام، لذا تُقدَّم الدقة على الاستدعاء عند الحدود، ولا يجوز التخمين بشأن العمال البعيدين أو المحجوبين."
   },
   "approach": [
-    { "en": "Crop-then-detect: a YOLO26 pose model finds each worker, then a fine-tuned YOLO26 PPE detector checks the crop.", "ar": "اقتطاع ثم كشف: نموذج وضعيات YOLO26 يحدد كل عامل، ثم نموذج YOLO26 مضبوط لمعدات السلامة يفحص المقطع." },
-    { "en": "Tri-state state machine (compliant, violation, indeterminate) with a grace window that confirms violations, so the system abstains on distant or occluded workers instead of guessing.", "ar": "آلة حالات ثلاثية (ملتزم، مخالف، غير محسوم) مع نافذة سماح لتأكيد المخالفات، فيمتنع النظام عن الحكم على العمال البعيدين أو المحجوبين بدل التخمين." },
-    { "en": "Uploaded video runs as async Celery jobs; live RTSP or browser-camera streams run over WebSocket. Only GPU workers hold models, and a latest-wins frame buffer keeps live latency flat.", "ar": "الفيديو المرفوع يُعالَج كمهام Celery غير متزامنة، والبث المباشر (RTSP أو كاميرا المتصفح) عبر WebSocket. عمّال GPU وحدهم يحملون النماذج، ومخزن إطارات يحتفظ بالأحدث فقط يبقي زمن الاستجابة ثابتاً." },
-    { "en": "Violators identified with InsightFace (SCRFD + ArcFace) against an enrolled gallery, aggregating quality-weighted embeddings per track to keep identities stable. Frame, person, and face evidence is stored for each violation.", "ar": "التعرّف على المخالفين بـ InsightFace (SCRFD + ArcFace) مقابل معرض مسجَّل، بتجميع تضمينات مرجّحة بالجودة لكل مسار للحفاظ على ثبات الهوية، مع حفظ أدلة الإطار والشخص والوجه لكل مخالفة." },
-    { "en": "YOLO26s fine-tuned on DGX Spark (MuSGD, cosine LR, mosaic/mixup/copy-paste, 150 epochs) with checkpoint auto-resume and an out-of-memory batch fallback, exported as NMS-free ONNX.", "ar": "ضبط YOLO26s على DGX Spark (MuSGD، ومعدل تعلّم جيبي، وزيادة بيانات mosaic/mixup/copy-paste، و150 حقبة) مع استئناف تلقائي وتراجع عند نفاد الذاكرة، وتصدير ONNX دون NMS." },
-    { "en": "Security hardening: CORS lockdown, HMAC-signed tokens, and SSRF prevention on stream URLs.", "ar": "تقوية أمنية: تقييد CORS، ورموز موقّعة بـ HMAC، ومنع هجمات SSRF على روابط البث." }
+    {
+      "en": "Crop-then-detect: a YOLO26 pose model finds each worker, then a fine-tuned YOLO26 PPE detector checks the crop.",
+      "ar": "اقتطاع ثم كشف: نموذج وضعيات YOLO26 يحدد كل عامل، ثم نموذج YOLO26 مضبوط لمعدات السلامة يفحص المقطع."
+    },
+    {
+      "en": "Tri-state state machine (compliant, violation, indeterminate) with a grace window that confirms violations, so the system abstains on distant or occluded workers instead of guessing.",
+      "ar": "آلة حالات ثلاثية (ملتزم، مخالف، غير محسوم) مع نافذة سماح لتأكيد المخالفات، فيمتنع النظام عن الحكم على العمال البعيدين أو المحجوبين بدل التخمين."
+    },
+    {
+      "en": "Uploaded video runs as async Celery jobs; live RTSP or browser-camera streams run over WebSocket. Only GPU workers hold models, and a latest-wins frame buffer keeps live latency flat.",
+      "ar": "الفيديو المرفوع يُعالَج كمهام Celery غير متزامنة، والبث المباشر (RTSP أو كاميرا المتصفح) عبر WebSocket. عمّال GPU وحدهم يحملون النماذج، ومخزن إطارات يحتفظ بالأحدث فقط يبقي زمن الاستجابة ثابتاً."
+    },
+    {
+      "en": "Violators identified with InsightFace (SCRFD + ArcFace) against an enrolled gallery, aggregating quality-weighted embeddings per track to keep identities stable. Frame, person, and face evidence is stored for each violation.",
+      "ar": "التعرّف على المخالفين بـ InsightFace (SCRFD + ArcFace) مقابل معرض مسجَّل، بتجميع تضمينات مرجّحة بالجودة لكل مسار للحفاظ على ثبات الهوية، مع حفظ أدلة الإطار والشخص والوجه لكل مخالفة."
+    },
+    {
+      "en": "YOLO26s fine-tuned on DGX Spark (MuSGD, cosine LR, mosaic/mixup/copy-paste, 150 epochs) with checkpoint auto-resume and an out-of-memory batch fallback, exported as NMS-free ONNX.",
+      "ar": "ضبط YOLO26s على DGX Spark (MuSGD، ومعدل تعلّم جيبي، وزيادة بيانات mosaic/mixup/copy-paste، و150 حقبة) مع استئناف تلقائي وتراجع عند نفاد الذاكرة، وتصدير ONNX دون NMS."
+    },
+    {
+      "en": "Security hardening: CORS lockdown, HMAC-signed tokens, and SSRF prevention on stream URLs.",
+      "ar": "تقوية أمنية: تقييد CORS، ورموز موقّعة بـ HMAC، ومنع هجمات SSRF على روابط البث."
+    }
   ],
   "pipeline": [
-    { "en": "RTSP / browser cam / video", "ar": "RTSP / كاميرا المتصفح / فيديو" },
-    { "en": "YOLO26 pose (workers)", "ar": "YOLO26 للوضعيات (العمال)" },
-    { "en": "Crop → YOLO26 PPE", "ar": "اقتطاع ← YOLO26 للمعدات" },
-    { "en": "Tri-state + grace window", "ar": "حالات ثلاثية + نافذة سماح" },
-    { "en": "InsightFace re-ID", "ar": "التعرّف بـ InsightFace" },
-    { "en": "Violation + evidence", "ar": "مخالفة + أدلة" }
+    {
+      "en": "RTSP / browser cam / video",
+      "ar": "RTSP / كاميرا المتصفح / فيديو"
+    },
+    {
+      "en": "YOLO26 pose (workers)",
+      "ar": "YOLO26 للوضعيات (العمال)"
+    },
+    {
+      "en": "Crop → YOLO26 PPE",
+      "ar": "اقتطاع ← YOLO26 للمعدات"
+    },
+    {
+      "en": "Tri-state + grace window",
+      "ar": "حالات ثلاثية + نافذة سماح"
+    },
+    {
+      "en": "InsightFace re-ID",
+      "ar": "التعرّف بـ InsightFace"
+    },
+    {
+      "en": "Violation + evidence",
+      "ar": "مخالفة + أدلة"
+    }
   ],
-  "stack": ["YOLO26", "InsightFace", "FastAPI", "Celery", "Redis", "WebSocket", "React", "ONNX", "Docker", "DGX Spark"],
+  "stack": [
+    "YOLO26",
+    "InsightFace",
+    "FastAPI",
+    "Celery",
+    "Redis",
+    "WebSocket",
+    "React",
+    "ONNX",
+    "Docker",
+    "DGX Spark"
+  ],
   "metrics": [
-    { "label": { "en": "Training run", "ar": "دورة التدريب" }, "value": "150 ep", "note": { "en": "YOLO26s · MuSGD · cosine LR", "ar": "YOLO26s · MuSGD · معدل جيبي" } },
-    { "label": { "en": "Compliance states", "ar": "حالات الالتزام" }, "value": "3", "note": { "en": "compliant · violation · indeterminate", "ar": "ملتزم · مخالف · غير محسوم" } },
-    { "label": { "en": "Input modes", "ar": "مصادر الإدخال" }, "value": "3", "note": { "en": "RTSP · browser camera · uploaded video", "ar": "RTSP · كاميرا المتصفح · فيديو مرفوع" } }
+    {
+      "label": {
+        "en": "Training run",
+        "ar": "دورة التدريب"
+      },
+      "value": "150 ep",
+      "note": {
+        "en": "YOLO26s · MuSGD · cosine LR",
+        "ar": "YOLO26s · MuSGD · معدل جيبي"
+      }
+    },
+    {
+      "label": {
+        "en": "Compliance states",
+        "ar": "حالات الالتزام"
+      },
+      "value": "3",
+      "note": {
+        "en": "compliant · violation · indeterminate",
+        "ar": "ملتزم · مخالف · غير محسوم"
+      }
+    },
+    {
+      "label": {
+        "en": "Input modes",
+        "ar": "مصادر الإدخال"
+      },
+      "value": "3",
+      "note": {
+        "en": "RTSP · browser camera · uploaded video",
+        "ar": "RTSP · كاميرا المتصفح · فيديو مرفوع"
+      }
+    }
+  ],
+  "media": [
+    {
+      "src": "/images/projects/ppe-compliance.webp",
+      "alt": {
+        "en": "Illustration: synthetic workers with detection boxes and helmet checks",
+        "ar": "رسم توضيحي: عمّال اصطناعيون بصناديق كشف وفحص للخوذ"
+      }
+    }
   ]
 }

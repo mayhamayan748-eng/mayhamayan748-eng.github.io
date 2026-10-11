@@ -2,7 +2,10 @@
   "order": 8,
   "featured": false,
   "nda": "light",
-  "title": { "en": "Chat with Your Data: Local Text-to-SQL RAG", "ar": "تحدّث مع بياناتك: RAG محلي لتحويل النص إلى SQL" },
+  "title": {
+    "en": "Chat with Your Data: Local Text-to-SQL RAG",
+    "ar": "تحدّث مع بياناتك: RAG محلي لتحويل النص إلى SQL"
+  },
   "summary": {
     "en": "An Arabic/English natural-language interface to an Oracle 19c database that runs fully on-premise, so no data leaves the server.",
     "ar": "واجهة بلغة طبيعية بالعربية والإنجليزية لقاعدة بيانات Oracle 19c تعمل محلياً بالكامل، فلا تغادر أي بيانات الخادم."
@@ -12,17 +15,56 @@
     "ar": "يحتاج المستخدمون إلى إجابات من قاعدة بيانات علائقية دون كتابة SQL، والبيانات أكثر حساسية من أن تُرسل إلى نموذج سحابي."
   },
   "approach": [
-    { "en": "Schema-aware retrieval: table and column descriptions indexed in Qdrant, so only the relevant schema reaches the prompt.", "ar": "استرجاع واعٍ بالمخطط: أوصاف الجداول والأعمدة مفهرسة في Qdrant، فلا يصل إلى المُوجِّه إلا الجزء المعني من المخطط." },
-    { "en": "A local Qwen model generates SQL through LlamaIndex, for questions in Arabic or English.", "ar": "نموذج Qwen محلي يولّد SQL عبر LlamaIndex، للأسئلة بالعربية أو الإنجليزية." },
-    { "en": "Fully on-premise: model, vector store, and database all run on the same server.", "ar": "محلي بالكامل: النموذج ومخزن المتجهات وقاعدة البيانات كلها على الخادم نفسه." }
+    {
+      "en": "Schema-aware retrieval: table and column descriptions indexed in Qdrant, so only the relevant schema reaches the prompt.",
+      "ar": "استرجاع واعٍ بالمخطط: أوصاف الجداول والأعمدة مفهرسة في Qdrant، فلا يصل إلى المُوجِّه إلا الجزء المعني من المخطط."
+    },
+    {
+      "en": "A local Qwen model generates SQL through LlamaIndex, for questions in Arabic or English.",
+      "ar": "نموذج Qwen محلي يولّد SQL عبر LlamaIndex، للأسئلة بالعربية أو الإنجليزية."
+    },
+    {
+      "en": "Fully on-premise: model, vector store, and database all run on the same server.",
+      "ar": "محلي بالكامل: النموذج ومخزن المتجهات وقاعدة البيانات كلها على الخادم نفسه."
+    }
   ],
   "pipeline": [
-    { "en": "Question (AR / EN)", "ar": "سؤال (عربي / إنجليزي)" },
-    { "en": "Schema retrieval (Qdrant)", "ar": "استرجاع المخطط (Qdrant)" },
-    { "en": "Local Qwen → SQL", "ar": "Qwen محلي ← SQL" },
-    { "en": "Oracle 19c", "ar": "Oracle 19c" },
-    { "en": "Answer", "ar": "الإجابة" }
+    {
+      "en": "Question (AR / EN)",
+      "ar": "سؤال (عربي / إنجليزي)"
+    },
+    {
+      "en": "Schema retrieval (Qdrant)",
+      "ar": "استرجاع المخطط (Qdrant)"
+    },
+    {
+      "en": "Local Qwen → SQL",
+      "ar": "Qwen محلي ← SQL"
+    },
+    {
+      "en": "Oracle 19c",
+      "ar": "Oracle 19c"
+    },
+    {
+      "en": "Answer",
+      "ar": "الإجابة"
+    }
   ],
-  "stack": ["Qwen (local)", "LlamaIndex", "Qdrant", "Oracle 19c", "Python"],
-  "metrics": []
+  "stack": [
+    "Qwen (local)",
+    "LlamaIndex",
+    "Qdrant",
+    "Oracle 19c",
+    "Python"
+  ],
+  "metrics": [],
+  "media": [
+    {
+      "src": "/images/projects/text-to-sql-rag.webp",
+      "alt": {
+        "en": "Illustration: a question, schema retrieval, generated SQL, and results, all on-premise",
+        "ar": "رسم توضيحي: سؤال واسترجاع المخطط وSQL مولَّد ونتائج، كلها محلياً"
+      }
+    }
+  ]
 }
