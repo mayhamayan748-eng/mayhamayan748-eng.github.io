@@ -1,0 +1,100 @@
+---
+import '@/styles/global.css';
+import Header from '@/components/Header.astro';
+import Footer from '@/components/Footer.astro';
+import { type Locale, dirOf, localePath, pick, useT } from '@/i18n/ui';
+import { profile, links } from '@/data/site';
+
+interface Props {
+  locale: Locale;
+  /** Path without locale prefix, used for hreflang and the language switch. */
+  path: string;
+  title?: string;
+  description?: string;
+}
+
+const { locale, path, title, description } = Astro.props;
+const t = useT(locale);
+const name = pick(profile.displayName, locale);
+const fullTitle = title ? `${title} · ${name}` : `${name} · ${pick(profile.title, locale)}`;
+const desc = description ?? pick(profile.tagline, locale);
+const site = Astro.site ?? new URL('https://example.com');
+const canonical = new URL(localePath(path, locale), site).href;
+const altEn = new URL(localePath(path, 'en'), site).href;
+const altAr = new URL(localePath(path, 'ar'), site).href;
+const ogImage = new URL(`${import.meta.env.BASE_URL.replace(/\/$/, '')}/og.jpg`, site).href;
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  name: profile.name.en,
+  alternateName: [profile.name.ar, profile.displayName.en],
+  jobTitle: profile.title.en,
+  address: { '@type': 'PostalAddress', addressLocality: 'Aleppo', addressCountry: 'SY' },
+  url: site.href,
+  sameAs: links.filter((l) => l.icon !== 'mail').map((l) => l.href),
+};
+---
+<!doctype html>
+<html lang={locale} dir={dirOf(locale)} class="no-js">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={desc} />
+    <link rel="canonical" href={canonical} />
+    <link rel="alternate" hreflang="en" href={altEn} />
+    <link rel="alternate" hreflang="ar" href={altAr} />
+    <link rel="alternate" hreflang="x-default" href={altEn} />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={desc} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:locale" content={locale === 'ar' ? 'ar_SY' : 'en_US'} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="theme-color" content="#0a0a0a" />
+    <link rel="icon" type="image/png" href={`${import.meta.env.BASE_URL.replace(/\/$/, '')}/favicon.png`} />
+    <link rel="apple-touch-icon" href={`${import.meta.env.BASE_URL.replace(/\/$/, '')}/apple-touch-icon.png`} />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
+    />
+    <script is:inline>
+      // Apply the saved theme before paint (dark is the default).
+      (function () {
+        var d = document.documentElement;
+        d.classList.remove('no-js');
+        try {
+          var t = localStorage.getItem('theme');
+          if (t === 'light') d.setAttribute('data-theme', 'light');
+        } catch (e) {}
+      })();
+    </script>
+    <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+  </head>
+  <body class="min-h-dvh bg-bg text-ink">
+    <a href="#main" class="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:start-3 focus:z-50 focus:rounded focus:bg-gold focus:px-3 focus:py-2 focus:text-on-gold">{t('nav.skip')}</a>
+    <Header locale={locale} path={path} />
+    <main id="main">
+      <slot />
+    </main>
+    <Footer locale={locale} />
+    <script>
+      // Subtle reveal-on-scroll for elements with .reveal
+      const els = document.querySelectorAll('.reveal');
+      if (!('IntersectionObserver' in window)) els.forEach((e) => e.classList.add('in'));
+      else {
+        const io = new IntersectionObserver(
+          (entries) => entries.forEach((en) => {
+            if (en.isIntersecting) { en.target.classList.add('in'); io.unobserve(en.target); }
+          }),
+          { rootMargin: '0px 0px -10% 0px' },
+        );
+        els.forEach((e) => io.observe(e));
+      }
+    </script>
+  </body>
+</html>

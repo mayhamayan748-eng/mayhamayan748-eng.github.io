@@ -1,0 +1,227 @@
+---
+import Base from '@/layouts/Base.astro';
+import Section from '@/components/Section.astro';
+import ProjectCard from '@/components/ProjectCard.astro';
+import Icon from '@/components/Icon.astro';
+import DetectionHero from '@/components/DetectionHero.tsx';
+import ContactForm from '@/components/ContactForm.tsx';
+import { type Locale, localePath, pick, useT } from '@/i18n/ui';
+import { profile, links, experience, education, certifications, community, publications, skills } from '@/data/site';
+import { getProjects } from '@/lib/projects';
+import { formatMonth } from '@/lib/format';
+
+interface Props { locale: Locale }
+const { locale } = Astro.props;
+const t = useT(locale);
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+
+const projects = await getProjects();
+const featured = projects.filter((p) => p.data.featured);
+const rest = projects.filter((p) => !p.data.featured);
+const titleOf = Object.fromEntries(projects.map((p) => [p.id, pick(p.data.title, locale)]));
+
+// Without a deployed API the form can't submit, so fall back to a mailto button.
+const apiUrl: string | undefined = import.meta.env.PUBLIC_API_URL;
+const mail = links.find((l) => l.icon === 'mail');
+const contactStrings = {
+  name: t('contact.name'), email: t('contact.email'), message: t('contact.message'),
+  send: t('contact.send'), sending: t('contact.sending'), ok: t('contact.ok'),
+  err: t('contact.err'), rate: t('contact.rate'), invalid: t('contact.invalid'),
+};
+
+const facts = [
+  { k: locale === 'ar' ? 'الموقع' : 'Based in', v: pick(profile.location, locale) },
+  { k: locale === 'ar' ? 'التركيز' : 'Focus', v: pick(profile.focus, locale) },
+  { k: locale === 'ar' ? 'التعليم' : 'Education', v: locale === 'ar' ? 'بكالوريوس هندسة تقانة المعلومات، جامعة حلب (2025)' : 'BSc IT Engineering, University of Aleppo (2025)' },
+  { k: locale === 'ar' ? 'العتاد' : 'Hardware', v: 'NVIDIA DGX Spark (GB10)' },
+  { k: locale === 'ar' ? 'اللغات' : 'Languages', v: pick(profile.languages, locale) },
+  { k: locale === 'ar' ? 'التوفر' : 'Availability', v: locale === 'ar' ? 'متاح للعمل عن بُعد' : 'Open to remote' },
+];
+let n = 0;
+const idx = () => String(++n).padStart(2, '0');
+---
+<Base locale={locale} path="/">
+  <!-- Hero -->
+  <section class="relative overflow-hidden">
+    <div class="mx-auto grid max-w-6xl items-center gap-10 px-4 pb-16 pt-12 sm:px-6 lg:grid-cols-12 lg:pb-24 lg:pt-20">
+      <div class="lg:col-span-5">
+        <p class="mb-5 font-mono text-xs uppercase tracking-[0.18em] text-gold">{t('hero.eyebrow')}</p>
+        <h1 class="text-4xl font-bold leading-[1.1] tracking-tight sm:text-5xl lg:text-6xl">
+          <span class="gold-text">{pick(profile.displayName, locale)}</span>
+        </h1>
+        <p class="mt-4 text-sm font-medium text-ink/80">{pick(profile.focus, locale)}</p>
+        <p class="mt-6 max-w-xl text-lg leading-relaxed text-muted">{pick(profile.tagline, locale)}</p>
+        <div class="mt-8 flex flex-wrap gap-3">
+          <a href="#projects" class="inline-flex h-11 items-center gap-2 rounded-lg bg-gold px-5 font-medium text-on-gold transition-colors hover:bg-gold-bright">
+            {t('hero.cta.projects')}<Icon name="arrow" class="flip-x size-4" />
+          </a>
+          <a href="#contact" class="inline-flex h-11 items-center rounded-lg border border-line px-5 font-medium transition-colors hover:border-gold hover:text-gold">{t('hero.cta.contact')}</a>
+          <a href={`${base}${profile.cvPath}`} download class="inline-flex h-11 items-center gap-2 rounded-lg px-3 text-muted transition-colors hover:text-gold">
+            <Icon name="download" class="size-4" />{t('hero.cta.cv')}
+          </a>
+        </div>
+        <p class="mt-8 text-sm text-muted">{t('hero.location')}</p>
+      </div>
+      <div class="lg:col-span-7">
+        <div class="relative aspect-[4/3] w-full overflow-hidden rounded-2xl border border-line bg-surface sm:aspect-[16/10]">
+          <DetectionHero client:load label={t('hero.canvas.label')} />
+        </div>
+      </div>
+    </div>
+    <div class="hairline mx-auto max-w-6xl opacity-60"></div>
+  </section>
+
+  <!-- About -->
+  <Section id="about" title={t('about.title')} index={idx()}>
+    <div class="reveal grid gap-10 md:grid-cols-12">
+      <div class="md:col-span-4">
+        {profile.photo ? (
+          <img src={`${base}${profile.photo}`} alt={pick(profile.name, locale)} width="640" height="800" class="aspect-[4/5] w-full max-w-xs rounded-2xl border border-line object-cover" loading="lazy" />
+        ) : (
+          <div class="grid aspect-square w-full max-w-xs place-items-center rounded-2xl border border-line bg-surface">
+            <span class="gold-text font-mono text-6xl font-semibold">{profile.initials}</span>
+          </div>
+        )}
+      </div>
+      <div class="md:col-span-8">
+        <p class="text-lg leading-relaxed">{pick(profile.bio, locale)}</p>
+        <dl class="mt-8 grid gap-4 sm:grid-cols-2">
+          {facts.map((f) => (
+            <div class="rounded-xl border border-line bg-surface p-4">
+              <dt class="font-mono text-xs uppercase tracking-wide text-gold">{f.k}</dt>
+              <dd class="mt-1">{f.v}</dd>
+            </div>
+          ))}
+        </dl>
+      </div>
+    </div>
+  </Section>
+
+  <!-- Projects -->
+  <Section id="projects" title={t('projects.title')} index={idx()}>
+    <div class="grid gap-6 md:grid-cols-2">
+      {featured.map((p, i) => {
+        const wide = i === 0 && featured.length % 2 === 1;
+        return (
+          <div class:list={[wide && 'md:col-span-2']}>
+            <ProjectCard project={p} locale={locale} large wide={wide} />
+          </div>
+        );
+      })}
+    </div>
+    <div class="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      {rest.map((p) => <ProjectCard project={p} locale={locale} />)}
+    </div>
+  </Section>
+
+  <!-- Skills -->
+  <Section id="skills" title={t('skills.title')} sub={t('skills.sub')} index={idx()}>
+    <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      {skills.map((g) => (
+        <div class="reveal rounded-2xl border border-line bg-surface p-5">
+          <h3 class="mb-4 font-semibold text-gold">{pick(g.name, locale)}</h3>
+          <ul class="grid gap-3">
+            {g.items.map((s) => (
+              <li>
+                <div class="font-mono text-sm" dir="ltr" style={locale === 'ar' ? 'text-align: right' : undefined}>{s.name}</div>
+                {s.usedIn.length > 0 && (
+                  <div class="mt-0.5 text-xs text-muted">
+                    {t('skills.usedIn')}:{' '}
+                    {s.usedIn.map((slug, i) => (
+                      <>
+                        <a href={localePath(`/projects/${slug}`, locale)} class="underline decoration-line underline-offset-2 hover:text-gold hover:decoration-gold">{titleOf[slug]}</a>{i < s.usedIn.length - 1 ? (locale === 'ar' ? '، ' : ', ') : ''}
+                      </>
+                    ))}
+                  </div>
+                )}
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))}
+    </div>
+  </Section>
+
+  <!-- Experience & education -->
+  <Section id="experience" title={t('experience.title')} index={idx()}>
+    <ol class="reveal relative border-s border-line ps-6">
+      {experience.map((e) => (
+        <li class="relative pb-8">
+          <span class="absolute -start-[1.95rem] top-1.5 size-3 rounded-full border-2 border-gold bg-bg"></span>
+          <p class="font-mono text-xs text-muted">{formatMonth(e.start, locale)} — {e.end ? formatMonth(e.end, locale) : t('present')}</p>
+          <h3 class="mt-1 text-lg font-semibold">{pick(e.role, locale)}</h3>
+          <p class="text-gold">{pick(e.org, locale)}{e.unit && <span class="text-muted"> · {pick(e.unit, locale)}</span>}</p>
+          <ul class="mt-3 grid gap-2 text-muted">
+            {e.points.map((pt) => <li class="flex gap-2"><span class="mt-2.5 size-1 shrink-0 rounded-full bg-gold"></span><span>{pick(pt, locale)}</span></li>)}
+          </ul>
+        </li>
+      ))}
+    </ol>
+
+    <h3 class="reveal mb-4 mt-6 text-xl font-semibold">{t('education.title')}</h3>
+    <div class="reveal grid gap-4 sm:grid-cols-2">
+      {education.map((ed) => (
+        <div class="rounded-xl border border-line bg-surface p-5">
+          <p class="font-semibold">{pick(ed.degree, locale)}</p>
+          <p class="text-muted">{pick(ed.school, locale)}{ed.year && <span> · {ed.year}</span>}</p>
+        </div>
+      ))}
+      {certifications.map((c) => (
+        <div class="rounded-xl border border-line bg-surface p-5">
+          <p class="font-semibold">{pick(c.name, locale)}</p>
+          <p class="text-muted">{pick(c.issuer, locale)}{c.year && <span> · {c.year}</span>}</p>
+        </div>
+      ))}
+    </div>
+  </Section>
+
+  <!-- Beyond code -->
+  {community.length > 0 && (
+    <Section id="beyond" title={t('beyond.title')} index={idx()}>
+      <ul class="reveal grid gap-4 sm:grid-cols-2">
+        {community.map((c) => <li class="rounded-xl border border-line bg-surface p-5 text-muted">{pick(c, locale)}</li>)}
+      </ul>
+    </Section>
+  )}
+
+  <!-- Publications (hidden when empty) -->
+  {publications.length > 0 && (
+    <Section id="publications" title={t('publications.title')} index={idx()}>
+      <ul class="grid gap-3">
+        {publications.map((p) => (
+          <li class="rounded-xl border border-line bg-surface p-5">
+            <a href={p.href} class="font-semibold hover:text-gold">{pick(p.title, locale)}</a>
+            <p class="text-sm text-muted">{pick(p.venue, locale)} · {p.year}</p>
+          </li>
+        ))}
+      </ul>
+    </Section>
+  )}
+
+  <!-- Contact -->
+  <Section id="contact" title={t('contact.title')} sub={t('contact.sub')} index={idx()}>
+    <div class="reveal grid gap-10 lg:grid-cols-12">
+      <div class="lg:col-span-8">
+        {apiUrl ? (
+          <ContactForm client:visible apiUrl={apiUrl} locale={locale} s={contactStrings} />
+        ) : mail && (
+          <a href={mail.href} class="inline-flex h-12 items-center gap-3 rounded-lg bg-gold px-6 font-medium text-on-gold transition-colors hover:bg-gold-bright">
+            <Icon name="mail" class="size-5" />{mail.href.replace('mailto:', '')}
+          </a>
+        )}
+      </div>
+      <div class="lg:col-span-4">
+        <p class="mb-3 font-mono text-xs uppercase tracking-wide text-gold">{t('contact.elsewhere')}</p>
+        <ul class="grid gap-2">
+          {links.map((l) => (
+            <li>
+              <a href={l.href} target={l.icon === 'mail' ? undefined : '_blank'} rel="noopener noreferrer" class="flex items-center gap-3 rounded-lg border border-line bg-surface px-4 py-3 transition-colors hover:border-gold/60 hover:text-gold">
+                <Icon name={l.icon} class="size-4.5" />{l.label}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  </Section>
+</Base>

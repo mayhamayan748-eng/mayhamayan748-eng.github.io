@@ -1,0 +1,38 @@
+{
+  "order": 1,
+  "featured": true,
+  "nda": "full",
+  "title": { "en": "Document-AI Platform for Arabic Forms", "ar": "منصة ذكاء المستندات للنماذج العربية" },
+  "summary": {
+    "en": "A spec-driven VLM engine that turns image-only Arabic PDFs into typed, section-structured JSON, with its own golden-set evaluation and fine-tuning loop.",
+    "ar": "محرّك قائم على المواصفات يحوّل ملفات PDF عربية مصوّرة إلى JSON منظّم بأقسام وأنواع محددة، مع حلقة تقييم وضبط دقيق خاصة به."
+  },
+  "problem": {
+    "en": "Image-only Arabic PDFs come in dozens of document types. Each new type usually means new prompts and new code, VLM calls are expensive, and without a trusted evaluation set nobody knows whether a prompt or model change made things better or worse.",
+    "ar": "تصل ملفات PDF العربية المصوّرة بعشرات الأنواع، وكل نوع جديد يعني عادةً مُوجِّهات وكوداً جديداً، واستدعاءات نماذج الرؤية مكلفة، ومن دون مجموعة تقييم موثوقة لا يعرف أحد إن كان تعديل المُوجِّه أو النموذج قد حسّن النتائج أم أفسدها."
+  },
+  "approach": [
+    { "en": "One declarative catalog of 123 fields across 31 document types generates every prompt and JSON schema, so a new document type needs no engine change.", "ar": "كتالوج تعريفي واحد يضم 123 حقلاً عبر 31 نوع مستند يولّد كل المُوجِّهات ومخططات JSON، فلا يحتاج أي نوع جديد إلى تعديل في المحرّك." },
+    { "en": "Cost held to 5–6 VLM calls per 5-page document: CPU-only page classification (OpenCV template matching, HSV masks) and cheapest-first field routing.", "ar": "تكلفة محصورة في 5–6 استدعاءات لكل مستند من 5 صفحات: تصنيف الصفحات على المعالج فقط (مطابقة القوالب في OpenCV وأقنعة HSV) وتوجيه الحقول من الأرخص أولاً." },
+    { "en": "Deterministic normalisation, cross-field checks, and typed issues send uncertain documents to human review instead of guessing.", "ar": "توحيد حتمي للصيغ، وفحوص بين الحقول، ومشكلات بأنواع محددة ترسل المستندات غير المؤكدة إلى المراجعة البشرية بدل التخمين." },
+    { "en": "Closed training loop: an annotation UI replays recorded model calls to build a golden set of 183 reviewed documents and exports LoRA datasets for Qwen3.5-VL (4B/9B), fine-tuned on DGX Spark and served with vLLM.", "ar": "حلقة تدريب مغلقة: واجهة وسم تعيد تشغيل استدعاءات النموذج المسجّلة لبناء مجموعة مرجعية من 183 مستنداً مراجَعاً، وتصدّر بيانات LoRA لـ Qwen3.5-VL (4B/9B) المضبوط على DGX Spark والمشغَّل عبر vLLM." },
+    { "en": "Per-field evaluation against the golden set (DocScore, straight-through-processing rate, critical-field pass rate) mirrored to W&B, plus a prompt playground that separates prompt failures from model failures.", "ar": "تقييم على مستوى الحقل مقابل المجموعة المرجعية (DocScore، ونسبة المعالجة دون تدخل، ونسبة نجاح الحقول الحرجة) منعكس في W&B، مع ساحة تجارب للمُوجِّهات تفصل أخطاء المُوجِّه عن أخطاء النموذج." }
+  ],
+  "pipeline": [
+    { "en": "Image-only PDF", "ar": "PDF مصوّر" },
+    { "en": "CPU page classification", "ar": "تصنيف الصفحات (CPU)" },
+    { "en": "Cheapest-first field routing", "ar": "توجيه الحقول من الأرخص" },
+    { "en": "VLM extraction (catalog-generated prompts)", "ar": "استخراج بالنموذج (مُوجِّهات من الكتالوج)" },
+    { "en": "Normalise + cross-field checks", "ar": "توحيد + فحوص بين الحقول" },
+    { "en": "Typed JSON / human review", "ar": "JSON منظّم / مراجعة بشرية" }
+  ],
+  "stack": ["Qwen3.5-VL", "Gemini", "Unsloth", "vLLM", "FastAPI", "Celery", "Redis", "PostgreSQL", "W&B", "Docker"],
+  "metrics": [
+    { "label": { "en": "Fields / document types", "ar": "الحقول / أنواع المستندات" }, "value": "123 / 31" },
+    { "label": { "en": "VLM calls per 5-page doc", "ar": "استدعاءات لكل مستند من 5 صفحات" }, "value": "5–6" },
+    { "label": { "en": "Golden-set documents", "ar": "مستندات المجموعة المرجعية" }, "value": "183" },
+    { "label": { "en": "Tests (no GPU or API key)", "ar": "اختبارات (دون GPU أو مفتاح API)" }, "value": "1,130" },
+    { "label": { "en": "Docker services", "ar": "خدمات Docker" }, "value": "8" },
+    { "label": { "en": "API paths", "ar": "مسارات API" }, "value": "52" }
+  ]
+}

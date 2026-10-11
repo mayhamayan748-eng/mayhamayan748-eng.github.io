@@ -1,0 +1,17 @@
+---
+import { type Locale, useT } from '@/i18n/ui';
+interface Props { nda: 'full' | 'light' | 'none'; locale: Locale }
+const { nda, locale } = Astro.props;
+const t = useT(locale);
+---
+{nda !== 'none' && (
+  <span
+    class:list={[
+      'inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 font-mono text-[11px] uppercase tracking-wide',
+      nda === 'full' ? 'border-amber/50 text-amber' : 'border-line text-muted',
+    ]}
+  >
+    <svg class="size-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2" /><path d="M8 11V7a4 4 0 0 1 8 0v4" /></svg>
+    {nda === 'full' ? t('nda.full') : t('nda.light')}
+  </span>
+)}

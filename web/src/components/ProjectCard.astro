@@ -1,0 +1,48 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import NdaBadge from './NdaBadge.astro';
+import Placeholder from './Placeholder.astro';
+import { type Locale, localePath, pick, useT } from '@/i18n/ui';
+
+interface Props { project: CollectionEntry<'projects'>; locale: Locale; large?: boolean; wide?: boolean }
+const { project, locale, large = false, wide = false } = Astro.props;
+const t = useT(locale);
+const p = project.data;
+const href = localePath(`/projects/${project.id}`, locale);
+const cover = p.media[0];
+const mediaCls = [
+  'w-full',
+  large ? 'aspect-[16/9]' : 'aspect-[16/10]',
+  wide && 'md:aspect-auto md:min-h-72 md:w-1/2 md:shrink-0',
+];
+---
+<a href={href} class:list={['group reveal flex h-full flex-col overflow-hidden rounded-2xl border border-line bg-surface transition-colors hover:border-gold/60', wide && 'md:flex-row']}>
+  {cover ? (
+    <img src={cover.src} alt={pick(cover.alt, locale)} loading="lazy" class:list={[...mediaCls, 'object-cover']} />
+  ) : (
+    <Placeholder seed={p.order} class:list={[...mediaCls, 'rounded-none border-0 border-b', wide && 'md:border-b-0 md:border-e']} />
+  )}
+  <div class:list={['flex flex-1 flex-col gap-3 p-5', wide && 'md:p-8']}>
+    <div class="flex flex-wrap items-center gap-2">
+      {p.featured && <span class="font-mono text-[11px] uppercase tracking-wide text-gold">{t('projects.featured')}</span>}
+      <NdaBadge nda={p.nda} locale={locale} />
+    </div>
+    <h3 class:list={['font-semibold tracking-tight transition-colors group-hover:text-gold', wide ? 'text-2xl' : large ? 'text-xl' : 'text-lg']}>{pick(p.title, locale)}</h3>
+    <p class="text-sm leading-relaxed text-muted">{pick(p.summary, locale)}</p>
+    {wide && p.metrics.length > 0 && (
+      <dl class="grid grid-cols-3 gap-3 pt-2">
+        {p.metrics.slice(0, 3).map((m) => (
+          <div>
+            <dd class="font-mono text-xl text-gold">{m.value ?? '—'}</dd>
+            <dt class="text-xs text-muted">{pick(m.label, locale)}</dt>
+          </div>
+        ))}
+      </dl>
+    )}
+    <ul class="mt-auto flex flex-wrap gap-1.5 pt-2" dir="ltr">
+      {p.stack.slice(0, large ? 6 : 4).map((s) => (
+        <li class="rounded-md bg-surface-2 px-2 py-0.5 font-mono text-[11px] text-muted">{s}</li>
+      ))}
+    </ul>
+  </div>
+</a>

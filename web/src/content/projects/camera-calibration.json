@@ -1,0 +1,29 @@
+{
+  "order": 6,
+  "featured": false,
+  "nda": "light",
+  "title": { "en": "Camera Calibration & Tilt-Compliance Web App", "ar": "تطبيق ويب لمعايرة الكاميرا وفحص الميل" },
+  "summary": {
+    "en": "Single-image camera calibration with GeoCalib plus OWLv2 zero-shot detection: name an object, and the app checks its tilt against a tolerance.",
+    "ar": "معايرة الكاميرا من صورة واحدة عبر GeoCalib مع كشف OWLv2 دون تدريب مسبق: اكتب اسم الجسم، ويفحص التطبيق ميله مقابل حد مسموح."
+  },
+  "problem": {
+    "en": "Checking whether installed objects are level or plumb usually needs a calibrated camera, but site photos rarely come with calibration on record.",
+    "ar": "التحقق من استواء الأجسام المركّبة أو استقامتها يتطلب عادةً كاميرا معايرة، لكن صور المواقع نادراً ما تأتي مع معايرة مسبقة."
+  },
+  "approach": [
+    { "en": "GeoCalib (ECCV 2024) estimates focal length, distortion, and gravity from a single image.", "ar": "GeoCalib (ECCV 2024) يقدّر البعد البؤري والتشوّه والجاذبية من صورة واحدة." },
+    { "en": "OWLv2 zero-shot detection finds the object by name, and its tilt is checked against the gravity direction and a tolerance.", "ar": "كشف OWLv2 دون تدريب مسبق يجد الجسم باسمه، ثم يُفحص ميله مقابل اتجاه الجاذبية وحد مسموح." },
+    { "en": "Inference is split from rendering so overlays redraw instantly. A shared-model race was fixed with per-model locks.", "ar": "الاستدلال مفصول عن العرض فتُعاد رسم الطبقات فوراً، وأُصلح تعارض على نموذج مشترك بأقفال لكل نموذج." },
+    { "en": "Non-root CPU/GPU Docker images, with pytest and Vitest in GitLab CI.", "ar": "صور Docker للمعالج وGPU تعمل دون صلاحيات root، مع pytest وVitest في GitLab CI." }
+  ],
+  "pipeline": [
+    { "en": "Single image", "ar": "صورة واحدة" },
+    { "en": "GeoCalib (intrinsics + gravity)", "ar": "GeoCalib (المعاملات + الجاذبية)" },
+    { "en": "OWLv2 find-by-name", "ar": "OWLv2 بحث بالاسم" },
+    { "en": "Tilt vs tolerance", "ar": "الميل مقابل الحد المسموح" },
+    { "en": "Overlay + verdict", "ar": "طبقة عرض + الحكم" }
+  ],
+  "stack": ["GeoCalib", "OWLv2", "FastAPI", "React", "TypeScript", "Docker", "GitLab CI"],
+  "metrics": []
+}

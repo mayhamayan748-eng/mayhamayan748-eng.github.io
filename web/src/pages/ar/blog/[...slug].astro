@@ -1,0 +1,16 @@
+---
+import Blog from '@/views/Blog.astro';
+import { getPosts } from '@/lib/posts';
+
+// No posts -> no blog pages at all.
+export async function getStaticPaths() {
+  const posts = await getPosts('ar');
+  if (posts.length === 0) return [];
+  return [
+    { params: { slug: undefined }, props: { posts, post: undefined } },
+    ...posts.map((post) => ({ params: { slug: post.slug }, props: { posts, post } })),
+  ];
+}
+const { posts, post } = Astro.props;
+---
+<Blog locale="ar" posts={posts} post={post} />

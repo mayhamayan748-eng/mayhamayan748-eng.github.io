@@ -1,0 +1,18 @@
+---
+import Base from '@/layouts/Base.astro';
+import { localePath, useT } from '@/i18n/ui';
+const t = useT('en');
+---
+<Base locale="en" path="/" title="404">
+  <section class="mx-auto grid min-h-[60vh] max-w-xl place-items-center px-4 text-center">
+    <div>
+      <div class="mx-auto mb-8 w-56 border border-dashed border-amber p-6">
+        <span class="font-mono text-xs text-amber">no detections · 0.00</span>
+      </div>
+      <h1 class="text-3xl font-bold">{t('notfound.title')}</h1>
+      <p class="mt-3 text-muted">{t('notfound.body')}</p>
+      <p class="mt-1 text-muted" lang="ar" dir="rtl">{useT('ar')('notfound.body')}</p>
+      <a href={localePath('/', 'en')} class="mt-8 inline-flex h-11 items-center rounded-lg bg-gold px-5 font-medium text-on-gold hover:bg-gold-bright">{t('notfound.home')}</a>
+    </div>
+  </section>
+</Base>

@@ -1,0 +1,33 @@
+{
+  "order": 3,
+  "featured": true,
+  "nda": "light",
+  "title": { "en": "VLM Fine-tuning Lab: Crops vs Full Pages", "ar": "مختبر ضبط نماذج الرؤية واللغة: مقاطع أم صفحات كاملة" },
+  "summary": {
+    "en": "Systematic LoRA/QLoRA experiments on Qwen3.5-VL across sizes and precisions, run through a resumable GPU trainer and served as multiple adapters on vLLM.",
+    "ar": "تجارب منهجية بـ LoRA/QLoRA على Qwen3.5-VL عبر أحجام ودقّات مختلفة، عبر خدمة تدريب قابلة للاستئناف، مع تشغيل محوّلات متعددة على vLLM."
+  },
+  "problem": {
+    "en": "For document understanding, does a vision-language model learn better from cropped regions or from full pages? And how much accuracy do 8-bit and 4-bit quantization cost in exchange for VRAM?",
+    "ar": "في فهم المستندات، هل يتعلّم نموذج الرؤية واللغة بشكل أفضل من مقاطع مقتطعة أم من صفحات كاملة؟ وكم من الدقة نخسر مقابل توفير الذاكرة عند التكميم إلى 8 و4 بت؟"
+  },
+  "approach": [
+    { "en": "Controlled experiment grid: Qwen3.5-VL 4B and 9B × bf16 / 8-bit / 4-bit × crop vs full-page inputs, fine-tuned with Unsloth.", "ar": "شبكة تجارب مضبوطة: Qwen3.5-VL بحجمي 4B و9B × bf16 / 8 بت / 4 بت × مقاطع مقابل صفحات كاملة، بضبط دقيق عبر Unsloth." },
+    { "en": "Training data exported from a human-reviewed golden set; runs go through a resumable GPU trainer service on DGX Spark.", "ar": "بيانات التدريب مصدّرة من مجموعة مرجعية مراجَعة بشرياً، والتشغيل عبر خدمة تدريب GPU قابلة للاستئناف على DGX Spark." },
+    { "en": "UUID-tracked adapter registry linking every adapter to its config, data split, and eval results.", "ar": "سجل محوّلات مُعرَّف بـ UUID يربط كل محوّل بإعداداته وتقسيم بياناته ونتائج تقييمه." },
+    { "en": "vLLM multi-LoRA serving behind an OpenAI-compatible API: one base model in memory, adapters selected per request.", "ar": "تشغيل متعدد المحوّلات عبر vLLM خلف واجهة متوافقة مع OpenAI: نموذج أساسي واحد في الذاكرة واختيار المحوّل لكل طلب." }
+  ],
+  "pipeline": [
+    { "en": "Golden set → LoRA dataset", "ar": "المجموعة المرجعية ← بيانات LoRA" },
+    { "en": "Unsloth LoRA / QLoRA", "ar": "Unsloth LoRA / QLoRA" },
+    { "en": "Adapter registry (UUID)", "ar": "سجل المحوّلات (UUID)" },
+    { "en": "Per-field evaluation", "ar": "تقييم على مستوى الحقل" },
+    { "en": "vLLM multi-adapter serving", "ar": "تشغيل vLLM متعدد المحوّلات" }
+  ],
+  "stack": ["Qwen3.5-VL", "Unsloth", "LoRA / QLoRA", "bitsandbytes", "vLLM", "W&B", "DGX Spark"],
+  "metrics": [
+    { "label": { "en": "Model sizes", "ar": "أحجام النموذج" }, "value": "4B / 9B" },
+    { "label": { "en": "Precisions compared", "ar": "الدقّات المقارنة" }, "value": "3", "note": { "en": "bf16 · 8-bit · 4-bit", "ar": "bf16 · 8 بت · 4 بت" } },
+    { "label": { "en": "Input variants", "ar": "أشكال الإدخال" }, "value": "2", "note": { "en": "region crops vs full pages", "ar": "مقاطع مقابل صفحات كاملة" } }
+  ]
+}

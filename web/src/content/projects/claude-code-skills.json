@@ -1,0 +1,22 @@
+{
+  "order": 10,
+  "featured": false,
+  "nda": "none",
+  "title": { "en": "Claude Code Skills Collection", "ar": "مجموعة مهارات Claude Code" },
+  "summary": {
+    "en": "Eight skills that encode how I work: CV, ML system design, LLM/RAG, FastAPI, code review, papers, prompts, and Git.",
+    "ar": "ثماني مهارات تختصر طريقة عملي: الرؤية الحاسوبية، وتصميم أنظمة التعلّم الآلي، وRAG، وFastAPI، ومراجعة الكود، والأوراق البحثية، والمُوجِّهات، وGit."
+  },
+  "problem": {
+    "en": "General-purpose assistants give generic answers. Skills encode domain defaults and output structure, so results are consistent and reviewable.",
+    "ar": "المساعدات العامة تعطي إجابات عامة. المهارات تحفظ الافتراضات الخاصة بكل مجال وبنية المخرجات، فتكون النتائج متسقة وقابلة للمراجعة."
+  },
+  "approach": [
+    { "en": "Skills: CV engineering, ML system design, LLM/RAG, FastAPI backend, Python code review, research-paper explainer, prompt engineering, and Git assistant.", "ar": "المهارات: هندسة الرؤية الحاسوبية، وتصميم أنظمة التعلّم الآلي، وLLM/RAG، وخلفيات FastAPI، ومراجعة كود Python، وشرح الأوراق البحثية، وهندسة المُوجِّهات، ومساعد Git." },
+    { "en": "Design philosophy: structured outputs, sensible defaults, transparent assumptions, and build first, explain after.", "ar": "فلسفة التصميم: مخرجات منظّمة، وافتراضات معقولة، وشفافية في الافتراضات، وابنِ أولاً ثم اشرح." }
+  ],
+  "pipeline": [],
+  "stack": ["Claude Code", "Markdown skills", "Python"],
+  "metrics": [],
+  "repo": null
+}

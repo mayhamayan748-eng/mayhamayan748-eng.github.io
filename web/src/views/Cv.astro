@@ -1,0 +1,24 @@
+---
+import Base from '@/layouts/Base.astro';
+import Icon from '@/components/Icon.astro';
+import { type Locale, useT } from '@/i18n/ui';
+import { profile } from '@/data/site';
+
+interface Props { locale: Locale }
+const { locale } = Astro.props;
+const t = useT(locale);
+const href = `${import.meta.env.BASE_URL.replace(/\/$/, '')}${profile.cvPath}`;
+---
+<Base locale={locale} path="/cv" title={t('cv.title')}>
+  <section class="mx-auto max-w-5xl px-4 py-12 sm:px-6">
+    <div class="mb-6 flex flex-wrap items-center justify-between gap-4">
+      <h1 class="text-3xl font-bold tracking-tight">{t('cv.title')}</h1>
+      <a href={href} download class="inline-flex h-11 items-center gap-2 rounded-lg bg-gold px-5 font-medium text-on-gold hover:bg-gold-bright">
+        <Icon name="download" class="size-4" />{t('cv.download')}
+      </a>
+    </div>
+    <object data={href} type="application/pdf" class="h-[80vh] w-full rounded-xl border border-line bg-surface">
+      <p class="p-6 text-muted"><a href={href} class="text-gold underline">{t('cv.download')}</a></p>
+    </object>
+  </section>
+</Base>

@@ -1,0 +1,29 @@
+# Render Blueprint: FastAPI service + managed Postgres (free tier).
+# Dashboard -> New -> Blueprint -> point at this repo.
+services:
+  - type: web
+    name: ayham-portfolio-api
+    runtime: docker
+    rootDir: api
+    plan: free
+    healthCheckPath: /health
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: ayham-portfolio-db
+          property: connectionString
+      - key: ALLOWED_ORIGINS
+        value: https://mayhamayan748-eng.github.io
+      - key: IP_HASH_SALT
+        generateValue: true
+      - key: RESEND_API_KEY
+        sync: false
+      - key: NOTIFY_EMAIL
+        sync: false
+      - key: RESEND_FROM
+        value: Portfolio <onboarding@resend.dev>
+
+databases:
+  - name: ayham-portfolio-db
+    plan: free
+    databaseName: portfolio

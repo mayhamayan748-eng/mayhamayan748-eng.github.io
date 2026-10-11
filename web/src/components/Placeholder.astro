@@ -1,0 +1,24 @@
+---
+/** Tasteful stand-in for missing media: dark gradient with a blurred detection-box motif. */
+interface Props { label?: string; class?: string; seed?: number }
+const { label = '', class: cls = '', seed = 1 } = Astro.props;
+// Deterministic pseudo-random boxes from the seed
+const r = (n: number) => ((Math.sin(seed * 9301 + n * 49297) + 1) / 2);
+const boxes = [0, 1, 2].map((i) => ({
+  x: 8 + r(i) * 55,
+  y: 18 + r(i + 7) * 35,
+  w: 18 + r(i + 3) * 22,
+  h: 26 + r(i + 5) * 30,
+}));
+---
+<div class:list={['relative overflow-hidden rounded-xl border border-line bg-surface', cls]} role="img" aria-label={label}>
+  <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_30%_20%,color-mix(in_oklab,var(--gold)_14%,transparent),transparent_60%)]"></div>
+  <svg class="absolute inset-0 h-full w-full blur-[1.5px]" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+    {boxes.map((b, i) => (
+      <rect x={b.x} y={b.y} width={b.w} height={b.h} fill="none"
+        stroke={i === 2 ? 'var(--amber)' : 'var(--gold)'} stroke-width="0.5"
+        stroke-dasharray={i === 2 ? '2 1.5' : undefined} vector-effect="non-scaling-stroke" opacity="0.7" />
+    ))}
+  </svg>
+  <div class="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-bg/70 to-transparent"></div>
+</div>

@@ -1,0 +1,15 @@
+---
+interface Props { id: string; title: string; sub?: string; index?: string }
+const { id, title, sub, index } = Astro.props;
+---
+<section id={id} class="mx-auto max-w-6xl scroll-mt-20 px-4 py-16 sm:px-6 sm:py-20">
+  <div class="reveal mb-10">
+    <div class="mb-3 flex items-center gap-3">
+      {index && <span class="font-mono text-xs text-gold">{index}</span>}
+      <span class="h-px w-10 bg-gold/60"></span>
+    </div>
+    <h2 class="text-2xl font-semibold tracking-tight sm:text-3xl">{title}</h2>
+    {sub && <p class="mt-2 max-w-2xl text-muted">{sub}</p>}
+  </div>
+  <slot />
+</section>

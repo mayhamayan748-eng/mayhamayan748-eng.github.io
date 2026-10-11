@@ -1,0 +1,97 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import Base from '@/layouts/Base.astro';
+import NdaBadge from '@/components/NdaBadge.astro';
+import Pipeline from '@/components/Pipeline.astro';
+import Placeholder from '@/components/Placeholder.astro';
+import Icon from '@/components/Icon.astro';
+import { type Locale, localePath, pick, useT } from '@/i18n/ui';
+
+interface Props { project: CollectionEntry<'projects'>; locale: Locale }
+const { project, locale } = Astro.props;
+const t = useT(locale);
+const p = project.data;
+const title = pick(p.title, locale);
+---
+<Base locale={locale} path={`/projects/${project.id}`} title={title} description={pick(p.summary, locale)}>
+  <article class="mx-auto max-w-4xl px-4 pb-10 pt-12 sm:px-6">
+    <a href={localePath('/projects', locale)} class="inline-flex items-center gap-2 text-sm text-muted hover:text-gold">
+      <Icon name="arrow" class="size-4 rotate-180 rtl:rotate-0" />{t('projects.back')}
+    </a>
+
+    <header class="mt-8">
+      <div class="mb-4 flex flex-wrap items-center gap-2">
+        {p.featured && <span class="font-mono text-[11px] uppercase tracking-wide text-gold">{t('projects.featured')}</span>}
+        <NdaBadge nda={p.nda} locale={locale} />
+      </div>
+      <h1 class="text-3xl font-bold tracking-tight sm:text-4xl">{title}</h1>
+      <p class="mt-4 text-lg text-muted">{pick(p.summary, locale)}</p>
+      {p.nda !== 'none' && (
+        <p class="mt-6 rounded-lg border border-line bg-surface px-4 py-3 text-sm text-muted">
+          {p.nda === 'full' ? t('nda.note.full') : t('nda.note.light')}
+        </p>
+      )}
+      {(p.repo || p.demo) && (
+        <div class="mt-6 flex flex-wrap gap-3">
+          {p.repo && <a href={p.repo} target="_blank" rel="noopener noreferrer" class="inline-flex h-10 items-center gap-2 rounded-lg border border-line px-4 text-sm hover:border-gold hover:text-gold"><Icon name="external" class="size-4" />{t('projects.repo')}</a>}
+          {p.demo && <a href={p.demo} target="_blank" rel="noopener noreferrer" class="inline-flex h-10 items-center gap-2 rounded-lg bg-gold px-4 text-sm font-medium text-on-gold hover:bg-gold-bright"><Icon name="external" class="size-4" />{t('projects.demo')}</a>}
+        </div>
+      )}
+    </header>
+
+    <div class="mt-10">
+      {p.media.length > 0 ? (
+        <div class="grid gap-4">
+          {p.media.map((m) => <img src={m.src} alt={pick(m.alt, locale)} loading="lazy" class="w-full rounded-xl border border-line" />)}
+        </div>
+      ) : (
+        <Placeholder seed={p.order} class="aspect-[16/8]" label={title} />
+      )}
+    </div>
+
+    <section class="mt-12">
+      <h2 class="mb-3 font-mono text-xs uppercase tracking-wide text-gold">{t('projects.problem')}</h2>
+      <p class="text-lg leading-relaxed">{pick(p.problem, locale)}</p>
+    </section>
+
+    <section class="mt-10">
+      <h2 class="mb-4 font-mono text-xs uppercase tracking-wide text-gold">{t('projects.approach')}</h2>
+      <ul class="grid gap-3">
+        {p.approach.map((a) => (
+          <li class="flex gap-3 leading-relaxed"><span class="mt-2.5 size-1.5 shrink-0 rounded-full bg-gold"></span><span>{pick(a, locale)}</span></li>
+        ))}
+      </ul>
+    </section>
+
+    {p.pipeline.length > 0 && (
+      <section class="mt-10">
+        <h2 class="mb-4 font-mono text-xs uppercase tracking-wide text-gold">{t('projects.architecture')}</h2>
+        <Pipeline stages={p.pipeline} locale={locale} />
+      </section>
+    )}
+
+    {p.metrics.length > 0 && (
+      <section class="mt-10">
+        <h2 class="mb-4 font-mono text-xs uppercase tracking-wide text-gold">{t('projects.metrics')}</h2>
+        <dl class="grid gap-4 sm:grid-cols-3">
+          {p.metrics.map((m) => (
+            <div class="rounded-xl border border-line bg-surface p-4">
+              <dt class="text-sm text-muted">{pick(m.label, locale)}</dt>
+              <dd class="mt-1 font-mono text-2xl text-gold" title={m.value ? undefined : t('projects.pending')}>
+                {m.value ?? '—'}
+              </dd>
+              {m.note && <dd class="mt-1 text-xs text-muted">{pick(m.note, locale)}</dd>}
+            </div>
+          ))}
+        </dl>
+      </section>
+    )}
+
+    <section class="mt-10">
+      <h2 class="mb-4 font-mono text-xs uppercase tracking-wide text-gold">{t('projects.stack')}</h2>
+      <ul class="flex flex-wrap gap-2" dir="ltr">
+        {p.stack.map((s) => <li class="rounded-md border border-line bg-surface px-2.5 py-1 font-mono text-xs">{s}</li>)}
+      </ul>
+    </section>
+  </article>
+</Base>

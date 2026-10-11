@@ -1,0 +1,18 @@
+---
+/** Generic architecture diagram: an ordered flow of stages. Wraps on small screens and mirrors in RTL. */
+import { type L, type Locale, pick } from '@/i18n/ui';
+interface Props { stages: L[]; locale: Locale }
+const { stages, locale } = Astro.props;
+---
+<ol class="flex flex-wrap items-stretch gap-y-3">
+  {stages.map((s, i) => (
+    <li class="flex items-center">
+      <div class="rounded-lg border border-line bg-surface px-3.5 py-2.5 text-sm">
+        <span class="me-2 font-mono text-xs text-gold">{String(i + 1).padStart(2, '0')}</span>{pick(s, locale)}
+      </div>
+      {i < stages.length - 1 && (
+        <svg class="flip-x mx-2 size-4 shrink-0 text-gold/70" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+      )}
+    </li>
+  ))}
+</ol>

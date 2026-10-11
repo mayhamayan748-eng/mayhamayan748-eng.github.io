@@ -1,0 +1,19 @@
+---
+import Base from '@/layouts/Base.astro';
+import Section from '@/components/Section.astro';
+import ProjectCard from '@/components/ProjectCard.astro';
+import { type Locale, useT } from '@/i18n/ui';
+import { getProjects } from '@/lib/projects';
+
+interface Props { locale: Locale }
+const { locale } = Astro.props;
+const t = useT(locale);
+const projects = await getProjects();
+---
+<Base locale={locale} path="/projects" title={t('projects.all')}>
+  <Section id="all-projects" title={t('projects.all')}>
+    <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      {projects.map((p) => <ProjectCard project={p} locale={locale} />)}
+    </div>
+  </Section>
+</Base>

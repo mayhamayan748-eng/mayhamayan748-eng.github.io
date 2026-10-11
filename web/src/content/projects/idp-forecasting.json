@@ -1,0 +1,28 @@
+{
+  "order": 9,
+  "featured": false,
+  "nda": "none",
+  "title": { "en": "IDP Flow Forecasting in Syria", "ar": "التنبؤ بتدفقات النزوح الداخلي في سوريا" },
+  "summary": {
+    "en": "Capstone ML system that forecasts internal displacement flows from ACAPS and HDX data, with SHAP explanations. Awarded 100/100.",
+    "ar": "مشروع تخرّج: نظام تعلّم آلي يتنبأ بتدفقات النزوح الداخلي من بيانات ACAPS وHDX مع تفسيرات SHAP، حصل على 100/100."
+  },
+  "problem": {
+    "en": "Humanitarian planning needs early estimates of where displaced people will move, from conflict-zone data that is sparse and noisy.",
+    "ar": "يحتاج التخطيط الإنساني إلى تقديرات مبكرة لوجهات النازحين، انطلاقاً من بيانات مناطق نزاع شحيحة ومليئة بالضجيج."
+  },
+  "approach": [
+    { "en": "Random Forest forecasting on sparse conflict-zone data from ACAPS and HDX, validated with cross-validation.", "ar": "تنبؤ بـ Random Forest على بيانات ACAPS وHDX الشحيحة من مناطق النزاع، مع تحقق متقاطع." },
+    { "en": "SHAP makes every prediction auditable, so analysts can see which factors drove a forecast.", "ar": "SHAP يجعل كل تنبؤ قابلاً للتدقيق، فيرى المحللون العوامل التي قادت إليه." }
+  ],
+  "pipeline": [
+    { "en": "ACAPS + HDX data", "ar": "بيانات ACAPS + HDX" },
+    { "en": "Feature engineering", "ar": "هندسة الميزات" },
+    { "en": "Random Forest", "ar": "Random Forest" },
+    { "en": "SHAP explanations", "ar": "تفسيرات SHAP" }
+  ],
+  "stack": ["scikit-learn", "Random Forest", "SHAP", "pandas"],
+  "metrics": [
+    { "label": { "en": "Capstone grade", "ar": "درجة مشروع التخرّج" }, "value": "100/100" }
+  ]
+}

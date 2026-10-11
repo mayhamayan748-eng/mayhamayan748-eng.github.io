@@ -1,0 +1,21 @@
+{
+  "order": 11,
+  "featured": false,
+  "nda": "none",
+  "title": { "en": "Face Generation with GANs", "ar": "توليد الوجوه بشبكات GAN" },
+  "summary": {
+    "en": "A GAN trained on UTKFace, with mode collapse fixed through label smoothing.",
+    "ar": "شبكة GAN مدرّبة على UTKFace، مع معالجة انهيار الأنماط عبر تنعيم التسميات."
+  },
+  "problem": {
+    "en": "GAN training on faces tends to collapse to a few repeated outputs.",
+    "ar": "يميل تدريب شبكات GAN على الوجوه إلى الانهيار نحو عدد قليل من المخرجات المتكررة."
+  },
+  "approach": [
+    { "en": "CNN generator and discriminator in TensorFlow, trained on UTKFace.", "ar": "مولّد ومميّز CNN في TensorFlow مدرّبان على UTKFace." },
+    { "en": "Label smoothing on the discriminator to stop mode collapse and recover output diversity.", "ar": "تنعيم التسميات في المميّز لإيقاف انهيار الأنماط واستعادة تنوّع المخرجات." }
+  ],
+  "pipeline": [],
+  "stack": ["TensorFlow", "CNN", "GAN"],
+  "metrics": []
+}
