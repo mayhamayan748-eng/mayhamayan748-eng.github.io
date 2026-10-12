@@ -258,23 +258,57 @@ export default function DetectionHero({ label, count = 5 }: { label: string; cou
       leg(p, body);
     }
 
-    function chip(x: number, y: number, text: string, color: string, alignBottom = true) {
-      ctx!.font = `500 ${w < 640 ? 10 : 11}px "JetBrains Mono", ui-monospace, monospace`;
-      const pad = 5;
-      const tw = ctx!.measureText(text).width + pad * 2;
-      const th = w < 640 ? 16 : 18;
-      const cy = alignBottom ? y - th : y;
-      const cx = Math.max(2, Math.min(x, w - tw - 2));
+    // Labels are queued while boxes draw, then placed nearest-figure-first so they never overlap.
+    type Rect = { x: number; y: number; w: number; h: number };
+    type Spot = { x: number; y: number; alignBottom: boolean; side?: 'left' };
+    type Label = { key: string; text: string; color: string; alpha: number; prio: number; spots: Spot[] };
+    let queue: Label[] = [];
+    const lastSpot = new Map<string, number>(); // sticky choice so labels don't flicker between spots
+
+    const chipFont = () => `500 ${w < 640 ? 10 : 11}px "JetBrains Mono", ui-monospace, monospace`;
+    const chipH = () => (w < 640 ? 16 : 18);
+
+    function chipRect(spot: Spot, tw: number): Rect {
+      const th = chipH();
+      const x0 = spot.side === 'left' ? spot.x - tw : spot.x;
+      return { x: Math.max(2, Math.min(x0, w - tw - 2)), y: spot.alignBottom ? spot.y - th : spot.y, w: tw, h: th };
+    }
+    const hits = (a: Rect, b: Rect) => a.x < b.x + b.w + 3 && b.x < a.x + a.w + 3 && a.y < b.y + b.h + 2 && b.y < a.y + a.h + 2;
+
+    function paintChip(r: Rect, text: string, color: string, alpha: number) {
+      ctx!.globalAlpha = 0.88 * alpha;
       ctx!.fillStyle = colors.bg;
-      ctx!.globalAlpha = 0.88;
-      ctx!.fillRect(cx, cy, tw, th);
-      ctx!.globalAlpha = 1;
+      ctx!.fillRect(r.x, r.y, r.w, r.h);
+      ctx!.globalAlpha = alpha;
       ctx!.strokeStyle = color;
       ctx!.lineWidth = 1;
-      ctx!.strokeRect(cx + 0.5, cy + 0.5, tw - 1, th - 1);
+      ctx!.strokeRect(r.x + 0.5, r.y + 0.5, r.w - 1, r.h - 1);
       ctx!.fillStyle = color;
       ctx!.textBaseline = 'middle';
-      ctx!.fillText(text, cx + pad, cy + th / 2 + 0.5);
+      ctx!.fillText(text, r.x + 5, r.y + r.h / 2 + 0.5);
+      ctx!.globalAlpha = 1;
+    }
+
+    function flushLabels() {
+      ctx!.font = chipFont();
+      // Keep clear of the HUD text in the top corners.
+      const placed: Rect[] = [{ x: 0, y: 0, w: 190, h: 46 }, { x: w - 150, y: 0, w: 150, h: 32 }];
+      queue.sort((a, b) => b.prio - a.prio);
+      for (const l of queue) {
+        const tw = ctx!.measureText(l.text).width + 10;
+        const prev = lastSpot.get(l.key);
+        const order = l.spots.map((_, i) => i);
+        if (prev !== undefined && prev < order.length) order.sort((a, b) => (a === prev ? -1 : b === prev ? 1 : a - b));
+        for (const i of order) {
+          const r = chipRect(l.spots[i], tw);
+          if (r.y < 0 || r.y + r.h > h || placed.some((p) => hits(p, r))) continue;
+          placed.push(r);
+          lastSpot.set(l.key, i);
+          paintChip(r, l.text, l.color, l.alpha);
+          break;
+        }
+      }
+      queue = [];
     }
 
     function drawBoxes(f: Figure) {
@@ -303,8 +337,14 @@ export default function DetectionHero({ label, count = 5 }: { label: string; cou
       ctx!.stroke();
 
       const id = String(f.id).padStart(2, '0');
-      const label = far ? `CHECKING-FAR · #${id}` : `person ${f.conf.toFixed(2)} · #${id}`;
-      chip(x, y - 2, label, color);
+      const narrow = w < 640;
+      const label = far
+        ? narrow ? 'CHECKING-FAR' : `CHECKING-FAR · #${id}`
+        : narrow ? `person ${f.conf.toFixed(2)}` : `person ${f.conf.toFixed(2)} · #${id}`;
+      queue.push({
+        key: `${f.id}:box`, text: label, color, alpha: 1, prio: f.z + 1,
+        spots: [{ x, y: y - 2, alignBottom: true }, { x: x + 2, y: y + 2, alignBottom: false }, { x, y: y + bh + 4, alignBottom: false }],
+      });
 
       // Head sub-box for near figures
       if (!far && H > 60) {
@@ -315,12 +355,16 @@ export default function DetectionHero({ label, count = 5 }: { label: string; cou
         ctx!.lineWidth = 1;
         ctx!.strokeRect(hx, hy, hr * 3, hr * 3.2);
         ctx!.setLineDash([]);
-        chip(hx + hr * 3 + 4, hy, violation ? 'no-helmet' : 'helmet ✓', color, false);
+        queue.push({
+          key: `${f.id}:head`, text: violation ? 'no-helmet' : 'helmet ✓', color, alpha: 1, prio: f.z,
+          spots: [{ x: hx + hr * 3 + 4, y: hy, alignBottom: false }, { x: hx - 4, y: hy, alignBottom: false, side: 'left' }, { x: hx + hr * 3 + 4, y: hy + hr * 3.2, alignBottom: true }],
+        });
       }
       if (f.reidFlash > 0 && !far) {
-        ctx!.globalAlpha = Math.min(1, f.reidFlash / 20);
-        chip(x, y + bh + 4, 're-ID ✓', colors.gold, false);
-        ctx!.globalAlpha = 1;
+        queue.push({
+          key: `${f.id}:reid`, text: 're-ID ✓', color: colors.gold, alpha: Math.min(1, f.reidFlash / 20), prio: f.z - 1,
+          spots: [{ x, y: y + bh + 4, alignBottom: false }, { x: x + 2, y: y + bh - 4, alignBottom: true }],
+        });
       }
     }
 
@@ -355,7 +399,10 @@ export default function DetectionHero({ label, count = 5 }: { label: string; cou
         if (f.reidFlash > 0) f.reidFlash--;
         // Occasionally simulate a re-identification event.
         if (Math.random() < 0.0015 && f.z >= FAR_Z) f.reidFlash = 60;
-        if (f.x < -0.12 || f.x > 1.12) figures[i] = spawn();
+        if (f.x < -0.12 || f.x > 1.12) {
+          for (const k of ['box', 'head', 'reid']) lastSpot.delete(`${f.id}:${k}`);
+          figures[i] = spawn();
+        }
       }
     }
 
@@ -365,6 +412,7 @@ export default function DetectionHero({ label, count = 5 }: { label: string; cou
       const sorted = [...figures].sort((a, b) => a.z - b.z);
       sorted.forEach(drawFigure);
       sorted.forEach(drawBoxes);
+      flushLabels();
       drawHud(figures.length);
     }
 
