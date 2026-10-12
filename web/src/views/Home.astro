@@ -44,14 +44,14 @@ const idx = () => String(++n).padStart(2, '0');
   <!-- Hero -->
   <section class="relative overflow-hidden">
     <div class="mx-auto grid max-w-6xl items-center gap-10 px-4 pb-16 pt-12 sm:px-6 lg:grid-cols-12 lg:pb-24 lg:pt-20">
-      <div class="lg:col-span-5">
-        <p class="mb-5 font-mono text-xs uppercase tracking-[0.18em] text-gold">{t('hero.eyebrow')}</p>
-        <h1 class="text-4xl font-bold leading-[1.1] tracking-tight sm:text-5xl lg:text-6xl">
+      <div class="lg:col-span-5" data-parallax="0.18">
+        <p class="hero-in mb-5 font-mono text-xs uppercase tracking-[0.18em] text-gold">{t('hero.eyebrow')}</p>
+        <h1 style="--d:80ms" class="hero-in text-4xl font-bold leading-[1.1] tracking-tight sm:text-5xl lg:text-6xl">
           <span class="gold-text">{pick(profile.displayName, locale)}</span>
         </h1>
-        <p class="mt-4 text-sm font-medium text-ink/80">{pick(profile.focus, locale)}</p>
-        <p class="mt-6 max-w-xl text-lg leading-relaxed text-muted">{pick(profile.tagline, locale)}</p>
-        <div class="mt-8 flex flex-wrap gap-3">
+        <p style="--d:180ms" class="hero-in mt-4 text-sm font-medium text-ink/80">{pick(profile.focus, locale)}</p>
+        <p style="--d:260ms" class="hero-in mt-6 max-w-xl text-lg leading-relaxed text-muted">{pick(profile.tagline, locale)}</p>
+        <div style="--d:360ms" class="hero-in mt-8 flex flex-wrap gap-3">
           <a href="#projects" class="inline-flex h-11 items-center gap-2 rounded-lg bg-gold px-5 font-medium text-on-gold transition-colors hover:bg-gold-bright">
             {t('hero.cta.projects')}<Icon name="arrow" class="flip-x size-4" />
           </a>
@@ -60,10 +60,10 @@ const idx = () => String(++n).padStart(2, '0');
             <Icon name="download" class="size-4" />{t('hero.cta.cv')}
           </a>
         </div>
-        <p class="mt-8 text-sm text-muted">{t('hero.location')}</p>
+        <p style="--d:440ms" class="hero-in mt-8 text-sm text-muted">{t('hero.location')}</p>
       </div>
-      <div class="lg:col-span-7">
-        <div class="relative aspect-[4/3] w-full overflow-hidden rounded-2xl border border-line bg-surface sm:aspect-[16/10]">
+      <div class="lg:col-span-7" data-parallax="0.08">
+        <div style="--d:200ms" class="hero-in relative aspect-[4/3] w-full overflow-hidden rounded-2xl border border-line bg-surface sm:aspect-[16/10]">
           <DetectionHero client:load label={t('hero.canvas.label')} />
         </div>
       </div>
@@ -85,7 +85,7 @@ const idx = () => String(++n).padStart(2, '0');
       </div>
       <div class="md:col-span-8">
         <p class="text-lg leading-relaxed">{pick(profile.bio, locale)}</p>
-        <dl class="mt-8 grid gap-4 sm:grid-cols-2">
+        <dl class="stagger mt-8 grid gap-4 sm:grid-cols-2">
           {facts.map((f) => (
             <div class="rounded-xl border border-line bg-surface p-4">
               <dt class="font-mono text-xs uppercase tracking-wide text-gold">{f.k}</dt>
@@ -144,7 +144,7 @@ const idx = () => String(++n).padStart(2, '0');
 
   <!-- Experience & education -->
   <Section id="experience" title={t('experience.title')} index={idx()}>
-    <ol class="reveal relative border-s border-line ps-6">
+    <ol class="reveal stagger relative border-s border-line ps-6">
       {experience.map((e) => (
         <li class="relative pb-8">
           <span class="absolute -start-[1.95rem] top-1.5 size-3 rounded-full border-2 border-gold bg-bg"></span>
@@ -159,7 +159,7 @@ const idx = () => String(++n).padStart(2, '0');
     </ol>
 
     <h3 class="reveal mb-4 mt-6 text-xl font-semibold">{t('education.title')}</h3>
-    <div class="reveal grid gap-4 sm:grid-cols-2">
+    <div class="reveal stagger grid gap-4 sm:grid-cols-2">
       {education.map((ed) => (
         <div class="rounded-xl border border-line bg-surface p-5">
           <p class="font-semibold">{pick(ed.degree, locale)}</p>
@@ -178,7 +178,7 @@ const idx = () => String(++n).padStart(2, '0');
   <!-- Beyond code -->
   {community.length > 0 && (
     <Section id="beyond" title={t('beyond.title')} index={idx()}>
-      <ul class="reveal grid gap-4 sm:grid-cols-2">
+      <ul class="reveal stagger grid gap-4 sm:grid-cols-2">
         {community.map((c) => <li class="rounded-xl border border-line bg-surface p-5 text-muted">{pick(c, locale)}</li>)}
       </ul>
     </Section>
