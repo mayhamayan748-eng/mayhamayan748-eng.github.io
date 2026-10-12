@@ -100,6 +100,14 @@ html[dir="rtl"] .sec-line { transform-origin: right; }
 .nav-link.active { color: var(--gold); }
 .nav-link.active::after { transform: scaleX(1); }
 
+/* Skill chips: project list pops over on hover / keyboard focus / tap. */
+.skill-pop { visibility: hidden; opacity: 0; transform: translateY(-4px); transition: opacity .18s ease, transform .18s ease, visibility 0s linear .18s; }
+.skill-pop { translate: var(--dx, 0) 0; }
+.skill:hover .skill-pop, .skill:focus-within .skill-pop { visibility: visible; opacity: 1; transform: none; transition-delay: 0s; }
+.skill:hover, .skill:focus-within { z-index: 30; }
+/* A small bridge so the pointer can travel from chip to popover. */
+.skill-pop::before { content: ""; position: absolute; inset-inline: 0; top: -10px; height: 10px; }
+
 /* Hero entrance on load. */
 @keyframes hero-in { from { opacity: 0; transform: translateY(20px); filter: blur(6px); } to { opacity: 1; transform: none; filter: none; } }
 .hero-in { animation: hero-in .9s cubic-bezier(.22,1,.36,1) both; animation-delay: var(--d, 0ms); }

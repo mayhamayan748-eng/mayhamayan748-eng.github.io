@@ -116,22 +116,30 @@ const idx = () => String(++n).padStart(2, '0');
 
   <!-- Skills -->
   <Section id="skills" title={t('skills.title')} sub={t('skills.sub')} index={idx()}>
-    <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+    <div class="gap-5 sm:columns-2 lg:columns-3">
       {skills.map((g) => (
-        <div class="reveal rounded-2xl border border-line bg-surface p-5">
+        <div class="reveal mb-5 break-inside-avoid rounded-2xl border border-line bg-surface p-5">
           <h3 class="mb-4 font-semibold text-gold">{pick(g.name, locale)}</h3>
-          <ul class="grid gap-3">
+          <ul class="flex flex-wrap gap-2">
             {g.items.map((s) => (
-              <li>
-                <div class="font-mono text-sm" dir="ltr" style={locale === 'ar' ? 'text-align: right' : undefined}>{s.name}</div>
+              <li class="skill group relative">
+                <button
+                  type="button"
+                  disabled={!s.usedIn.length}
+                  class:list={['inline-flex items-center gap-1.5 rounded-md border border-line bg-surface-2 px-2.5 py-1 font-mono text-xs transition-colors', s.usedIn.length && 'cursor-pointer group-hover:border-gold/60 group-hover:text-gold group-focus-within:border-gold/60 group-focus-within:text-gold']}
+                  dir="ltr"
+                >
+                  {s.name}
+                  {s.usedIn.length > 0 && <span class="text-[10px] text-gold/70" aria-hidden="true">{s.usedIn.length}</span>}
+                </button>
                 {s.usedIn.length > 0 && (
-                  <div class="mt-0.5 text-xs text-muted">
-                    {t('skills.usedIn')}:{' '}
-                    {s.usedIn.map((slug, i) => (
-                      <>
-                        <a href={localePath(`/projects/${slug}`, locale)} class="underline decoration-line underline-offset-2 hover:text-gold hover:decoration-gold">{titleOf[slug]}</a>{i < s.usedIn.length - 1 ? (locale === 'ar' ? '، ' : ', ') : ''}
-                      </>
-                    ))}
+                  <div class="skill-pop absolute start-0 top-full z-30 mt-2 w-64 max-w-[80vw] rounded-lg border border-line bg-surface p-3 text-xs shadow-xl">
+                    <p class="mb-1.5 text-muted">{t('skills.usedIn')}</p>
+                    <ul class="grid gap-1">
+                      {s.usedIn.map((slug) => (
+                        <li><a href={localePath(`/projects/${slug}`, locale)} class="block rounded px-1.5 py-1 hover:bg-surface-2 hover:text-gold">{titleOf[slug]}</a></li>
+                      ))}
+                    </ul>
                   </div>
                 )}
               </li>
@@ -205,15 +213,26 @@ const idx = () => String(++n).padStart(2, '0');
         {apiUrl ? (
           <ContactForm client:visible apiUrl={apiUrl} locale={locale} s={contactStrings} />
         ) : mail && (
-          <a href={mail.href} class="inline-flex h-12 items-center gap-3 rounded-lg bg-gold px-6 font-medium text-on-gold transition-colors hover:bg-gold-bright">
-            <Icon name="mail" class="size-5" />{mail.href.replace('mailto:', '')}
-          </a>
+          <div class="relative overflow-hidden rounded-2xl border border-line bg-surface p-6 sm:p-10">
+            <div class="pointer-events-none absolute -end-24 -top-24 size-72 rounded-full bg-gold/10 blur-3xl" aria-hidden="true"></div>
+            <p class="font-mono text-xs uppercase tracking-wide text-gold">{t('contact.direct')}</p>
+            <a href={mail.href} dir="ltr" class="gold-text mt-3 block text-xl font-semibold tracking-tight [overflow-wrap:anywhere] sm:text-4xl">{mail.href.replace('mailto:', '')}</a>
+            <p class="mt-4 max-w-md text-muted">{t('hero.location')}</p>
+            <div class="mt-8 flex flex-wrap gap-3">
+              <a href={mail.href} class="inline-flex h-11 items-center gap-2 rounded-lg bg-gold px-5 font-medium text-on-gold transition-colors hover:bg-gold-bright">
+                <Icon name="mail" class="size-4.5" />{t('contact.write')}
+              </a>
+              <button type="button" id="copy-email" data-email={mail.href.replace('mailto:', '')} data-done={t('contact.copied')} class="inline-flex h-11 items-center rounded-lg border border-line px-5 font-medium transition-colors hover:border-gold hover:text-gold">
+                <span>{t('contact.copy')}</span>
+              </button>
+            </div>
+          </div>
         )}
       </div>
       <div class="lg:col-span-4">
         <p class="mb-3 font-mono text-xs uppercase tracking-wide text-gold">{t('contact.elsewhere')}</p>
         <ul class="grid gap-2">
-          {links.map((l) => (
+          {links.filter((l) => apiUrl || l.icon !== 'mail').map((l) => (
             <li>
               <a href={l.href} target={l.icon === 'mail' ? undefined : '_blank'} rel="noopener noreferrer" class="flex items-center gap-3 rounded-lg border border-line bg-surface px-4 py-3 transition-colors hover:border-gold/60 hover:text-gold">
                 <Icon name={l.icon} class="size-4.5" />{l.label}
@@ -225,3 +244,32 @@ const idx = () => String(++n).padStart(2, '0');
     </div>
   </Section>
 </Base>
+
+<script>
+  // Copy the email address (contact card shown when there is no API form).
+  const copyBtn = document.getElementById('copy-email');
+  copyBtn?.addEventListener('click', async () => {
+    const label = copyBtn.querySelector('span')!;
+    const original = label.textContent;
+    try {
+      await navigator.clipboard.writeText(copyBtn.dataset.email ?? '');
+      label.textContent = copyBtn.dataset.done ?? '';
+      setTimeout(() => (label.textContent = original), 1800);
+    } catch {}
+  });
+
+  // Keep skill popovers inside the viewport (chips near the edge would otherwise spill off-screen).
+  const fit = (li: Element) => {
+    const pop = li.querySelector<HTMLElement>('.skill-pop');
+    if (!pop) return;
+    pop.style.setProperty('--dx', '0px');
+    const r = pop.getBoundingClientRect();
+    const m = 8;
+    const dx = r.right > innerWidth - m ? innerWidth - m - r.right : r.left < m ? m - r.left : 0;
+    pop.style.setProperty('--dx', `${dx}px`);
+  };
+  document.querySelectorAll('.skill').forEach((li) => {
+    li.addEventListener('pointerenter', () => fit(li));
+    li.addEventListener('focusin', () => fit(li));
+  });
+</script>
