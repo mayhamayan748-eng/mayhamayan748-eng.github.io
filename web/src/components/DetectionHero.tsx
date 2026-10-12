@@ -23,7 +23,7 @@ type Figure = {
   reidFlash: number; // frames left to show "re-ID ✓"
 };
 
-type Colors = { gold: string; amber: string; bg: string; text: string; muted: string; line: string };
+type Colors = { gold: string; amber: string; bg: string; surface: string; text: string; muted: string; line: string };
 
 const FAR_Z = 0.42;
 let nextId = 1;
@@ -49,6 +49,17 @@ function spawn(initial = false): Figure {
   };
 }
 
+/** Blend two hex colors; t=0 gives a, t=1 gives b. Silhouettes are drawn opaque so overlapping limbs don't double up. */
+function mix(a: string, b: string, t: number) {
+  const p = (h: string) => {
+    const x = h.replace('#', '');
+    const f = x.length === 3 ? x.split('').map((c) => c + c).join('') : x.slice(0, 6);
+    return [0, 2, 4].map((i) => parseInt(f.slice(i, i + 2), 16) || 0);
+  };
+  const [A, B] = [p(a), p(b)];
+  return `rgb(${A.map((v, i) => Math.round(v + (B[i] - v) * t)).join(',')})`;
+}
+
 function readColors(): Colors {
   const s = getComputedStyle(document.documentElement);
   const v = (n: string, f: string) => s.getPropertyValue(n).trim() || f;
@@ -56,6 +67,7 @@ function readColors(): Colors {
     gold: v('--gold', '#d4af37'),
     amber: v('--amber', '#c9852b'),
     bg: v('--bg', '#0a0a0a'),
+    surface: v('--surface', '#141414'),
     text: v('--text', '#f5f1e8'),
     muted: v('--muted', '#a39e93'),
     line: v('--border', '#2a2622'),
@@ -156,47 +168,94 @@ export default function DetectionHero({ label, count = 5 }: { label: string; cou
 
     function drawFigure(f: Figure) {
       const { H, cx, by } = figureGeom(f);
-      const swing = Math.sin(f.phase) * H * 0.07;
-      const headR = H * 0.075;
-      const top = by - H;
-      ctx!.fillStyle = colors.muted;
-      ctx!.globalAlpha = 0.18 + 0.32 * f.z;
-      // head
-      ctx!.beginPath();
-      ctx!.arc(cx, top + headR * 1.4, headR, 0, Math.PI * 2);
-      ctx!.fill();
-      // helmet
-      if (f.helmet) {
-        ctx!.beginPath();
-        ctx!.ellipse(cx, top + headR * 1.05, headR * 1.15, headR * 0.75, 0, Math.PI, 0);
-        ctx!.fill();
-      }
-      // torso
-      const tw = H * 0.2;
-      roundRect(cx - tw / 2, top + headR * 2.6, tw, H * 0.36, tw * 0.3);
-      ctx!.fill();
-      // legs
-      ctx!.lineWidth = H * 0.07;
-      ctx!.lineCap = 'round';
-      ctx!.strokeStyle = colors.muted;
-      const hip = top + headR * 2.6 + H * 0.34;
-      ctx!.beginPath();
-      ctx!.moveTo(cx - tw * 0.2, hip);
-      ctx!.lineTo(cx - tw * 0.2 + swing, by - H * 0.03);
-      ctx!.moveTo(cx + tw * 0.2, hip);
-      ctx!.lineTo(cx + tw * 0.2 - swing, by - H * 0.03);
-      ctx!.stroke();
-      ctx!.globalAlpha = 1;
-    }
+      const d = f.dir; // facing direction (side view)
+      const p = f.phase;
+      // Opaque tones: near figures stand out, far ones sink into the floor.
+      const strength = 0.3 + 0.45 * f.z;
+      const body = mix(colors.surface, colors.muted, strength);
+      const back = mix(colors.surface, colors.muted, strength * 0.62); // limbs on the far side
+      const bob = Math.abs(Math.cos(p)) * H * 0.012;
+      const ground = by - H * 0.01;
+      const hipY = by - H * 0.5 - bob;
+      const shoulderY = by - H * 0.81 - bob;
+      const lean = H * 0.025 * d;
+      const hipX = cx;
+      const shX = cx + lean;
+      const headR = H * 0.068;
+      const headX = shX + d * H * 0.012;
+      const headY = shoulderY - H * 0.035 - headR;
 
-    function roundRect(x: number, y: number, rw: number, rh: number, r: number) {
+      const limb = (pts: [number, number][], width: number, color: string) => {
+        ctx!.strokeStyle = color;
+        ctx!.lineWidth = width;
+        ctx!.lineCap = 'round';
+        ctx!.lineJoin = 'round';
+        ctx!.beginPath();
+        ctx!.moveTo(pts[0][0], pts[0][1]);
+        for (let i = 1; i < pts.length; i++) ctx!.lineTo(pts[i][0], pts[i][1]);
+        ctx!.stroke();
+      };
+      // Angles are measured from straight down; positive swings toward the facing direction.
+      const at = (x: number, y: number, len: number, ang: number): [number, number] => [x + Math.sin(ang) * len * d, y + Math.cos(ang) * len];
+
+      const leg = (ph: number, color: string) => {
+        const thigh = Math.sin(ph) * 0.42;
+        const bend = 0.08 + 0.55 * Math.max(0, Math.cos(ph)) * Math.max(0, Math.sin(ph + 1.2)); // knee folds on the swing-through
+        const knee = at(hipX, hipY, H * 0.25, thigh);
+        const ankle = at(knee[0], knee[1], H * 0.23, thigh - bend);
+        const ay = Math.min(ankle[1], ground - H * 0.015);
+        const toe: [number, number] = [ankle[0] + d * H * 0.065, Math.min(ay + H * 0.012, ground)];
+        limb([[hipX, hipY], knee, [ankle[0], ay]], H * 0.075, color);
+        limb([[ankle[0] - d * H * 0.012, ay], toe], H * 0.045, color); // shoe
+      };
+      const arm = (ph: number, color: string) => {
+        const upper = -Math.sin(ph) * 0.38; // arms counter-swing the legs
+        const elbowBend = 0.25 + 0.3 * Math.max(0, -Math.sin(ph));
+        const elbow = at(shX, shoulderY + H * 0.015, H * 0.16, upper);
+        const wrist = at(elbow[0], elbow[1], H * 0.145, upper + elbowBend);
+        limb([[shX, shoulderY + H * 0.015], elbow, wrist], H * 0.05, color);
+        ctx!.fillStyle = color;
+        ctx!.beginPath();
+        ctx!.arc(wrist[0] + d * H * 0.008, wrist[1] + H * 0.012, H * 0.026, 0, Math.PI * 2); // hand
+        ctx!.fill();
+      };
+
+      // Far-side limbs first, then torso and head, then near-side limbs.
+      arm(p + Math.PI, back);
+      leg(p + Math.PI, back);
+      // Torso: shoulders taper to the waist.
+      const sw = H * 0.085;
+      const ww = H * 0.065;
+      ctx!.fillStyle = body;
       ctx!.beginPath();
-      ctx!.moveTo(x + r, y);
-      ctx!.arcTo(x + rw, y, x + rw, y + rh, r);
-      ctx!.arcTo(x + rw, y + rh, x, y + rh, r);
-      ctx!.arcTo(x, y + rh, x, y, r);
-      ctx!.arcTo(x, y, x + rw, y, r);
+      ctx!.moveTo(shX - sw, shoulderY + H * 0.01);
+      ctx!.quadraticCurveTo(shX - sw, shoulderY - H * 0.02, shX, shoulderY - H * 0.02);
+      ctx!.quadraticCurveTo(shX + sw, shoulderY - H * 0.02, shX + sw, shoulderY + H * 0.01);
+      ctx!.lineTo(hipX + ww, hipY + H * 0.02);
+      ctx!.quadraticCurveTo(hipX, hipY + H * 0.05, hipX - ww, hipY + H * 0.02);
       ctx!.closePath();
+      ctx!.fill();
+      // Neck and head (slightly forward, like a real walk).
+      limb([[shX, shoulderY], [headX - d * H * 0.005, headY + headR * 0.8]], H * 0.04, body);
+      ctx!.beginPath();
+      ctx!.ellipse(headX, headY, headR * 0.92, headR, 0, 0, Math.PI * 2);
+      ctx!.fill();
+      // Nose hint so the facing direction reads.
+      ctx!.beginPath();
+      ctx!.moveTo(headX + d * headR * 0.85, headY - headR * 0.1);
+      ctx!.lineTo(headX + d * headR * 1.15, headY + headR * 0.25);
+      ctx!.lineTo(headX + d * headR * 0.8, headY + headR * 0.35);
+      ctx!.fill();
+      if (f.helmet) {
+        // Hard hat: dome plus a brim that sticks out front.
+        ctx!.fillStyle = mix(colors.surface, colors.text, strength * 0.9);
+        ctx!.beginPath();
+        ctx!.ellipse(headX, headY - headR * 0.15, headR * 1.08, headR * 0.95, 0, Math.PI, 0);
+        ctx!.fill();
+        ctx!.fillRect(Math.min(headX - d * headR * 1.05, headX + d * headR * 1.45), headY - headR * 0.2, headR * 2.5, headR * 0.22);
+      }
+      arm(p, body);
+      leg(p, body);
     }
 
     function chip(x: number, y: number, text: string, color: string, alignBottom = true) {
