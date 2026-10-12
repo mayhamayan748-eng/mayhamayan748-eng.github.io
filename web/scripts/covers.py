@@ -69,17 +69,60 @@ def arrow(x1, y1, x2, y2, color=GOLD, sw=3, dash=None):
             f'<polyline points="{a1[0]:.1f},{a1[1]:.1f} {x2},{y2} {a2[0]:.1f},{a2[1]:.1f}" fill="none" stroke="{color}" stroke-width="{sw}" stroke-linejoin="round"/>')
 
 
-def person(cx, by, h, helmet=True, op=0.55):
-    hr = h * 0.075
-    top = by - h
-    tw = h * 0.2
-    s = f'<g fill="{MUTED}" opacity="{op}">'
-    s += f'<circle cx="{cx}" cy="{top + hr * 1.4}" r="{hr}"/>'
+def _mix(a, b, t):
+    pa = [int(a[i:i + 2], 16) for i in (1, 3, 5)]
+    pb = [int(b[i:i + 2], 16) for i in (1, 3, 5)]
+    return "#" + "".join(f"{round(x + (y - x) * t):02x}" for x, y in zip(pa, pb))
+
+
+def person(cx, by, h, helmet=True, op=0.55, phase=0.9, d=1):
+    """Side-view walker mid-stride; mirrors DetectionHero.tsx so the cover matches the live hero."""
+    body = _mix(SURF, MUTED, op * 1.3)
+    back = _mix(SURF, MUTED, op * 0.8)
+    hip_y, sh_y = by - h * 0.5, by - h * 0.81
+    sh_x = cx + h * 0.025 * d
+    head_r = h * 0.068
+    head_x, head_y = sh_x + d * h * 0.012, sh_y - h * 0.035 - head_r
+
+    def at(x, y, ln, ang):
+        return x + math.sin(ang) * ln * d, y + math.cos(ang) * ln
+
+    def limb(pts, w, c):
+        pp = " ".join(f"{x:.1f},{y:.1f}" for x, y in pts)
+        return f'<polyline points="{pp}" fill="none" stroke="{c}" stroke-width="{w:.1f}" stroke-linecap="round" stroke-linejoin="round"/>'
+
+    def leg(ph, c):
+        thigh = math.sin(ph) * 0.42
+        bend = 0.08 + 0.55 * max(0, math.cos(ph)) * max(0, math.sin(ph + 1.2))
+        knee = at(cx, hip_y, h * 0.25, thigh)
+        ank = at(*knee, h * 0.23, thigh - bend)
+        ay = min(ank[1], by - h * 0.025)
+        toe = (ank[0] + d * h * 0.065, min(ay + h * 0.012, by - h * 0.01))
+        return limb([(cx, hip_y), knee, (ank[0], ay)], h * 0.075, c) + limb([(ank[0] - d * h * 0.012, ay), toe], h * 0.045, c)
+
+    def arm(ph, c):
+        up = -math.sin(ph) * 0.38
+        eb = 0.25 + 0.3 * max(0, -math.sin(ph))
+        s0 = (sh_x, sh_y + h * 0.015)
+        el = at(*s0, h * 0.16, up)
+        wr = at(*el, h * 0.145, up + eb)
+        return limb([s0, el, wr], h * 0.05, c) + f'<circle cx="{wr[0] + d * h * 0.008:.1f}" cy="{wr[1] + h * 0.012:.1f}" r="{h * 0.026:.1f}" fill="{c}"/>'
+
+    sw, ww = h * 0.085, h * 0.065
+    s = "<g>" + arm(phase + math.pi, back) + leg(phase + math.pi, back)
+    s += (f'<path d="M{sh_x - sw:.1f},{sh_y + h * 0.01:.1f} Q{sh_x - sw:.1f},{sh_y - h * 0.02:.1f} {sh_x:.1f},{sh_y - h * 0.02:.1f} '
+          f'Q{sh_x + sw:.1f},{sh_y - h * 0.02:.1f} {sh_x + sw:.1f},{sh_y + h * 0.01:.1f} L{cx + ww:.1f},{hip_y + h * 0.02:.1f} '
+          f'Q{cx:.1f},{hip_y + h * 0.05:.1f} {cx - ww:.1f},{hip_y + h * 0.02:.1f} Z" fill="{body}"/>')
+    s += limb([(sh_x, sh_y), (head_x - d * h * 0.005, head_y + head_r * 0.8)], h * 0.04, body)
+    s += f'<ellipse cx="{head_x:.1f}" cy="{head_y:.1f}" rx="{head_r * 0.92:.1f}" ry="{head_r:.1f}" fill="{body}"/>'
+    s += (f'<polygon points="{head_x + d * head_r * 0.85:.1f},{head_y - head_r * 0.1:.1f} {head_x + d * head_r * 1.15:.1f},{head_y + head_r * 0.25:.1f} '
+          f'{head_x + d * head_r * 0.8:.1f},{head_y + head_r * 0.35:.1f}" fill="{body}"/>')
     if helmet:
-        s += f'<path d="M{cx - hr * 1.2},{top + hr * 1.15} a{hr * 1.2},{hr * 0.9} 0 0 1 {hr * 2.4},0 z" fill="{SILVER}"/>'
-    s += f'<rect x="{cx - tw / 2}" y="{top + hr * 2.6}" width="{tw}" height="{h * 0.36}" rx="{tw * 0.3}"/>'
-    s += f'<rect x="{cx - tw * 0.38}" y="{top + hr * 2.6 + h * 0.33}" width="{tw * 0.3}" height="{h * 0.42}" rx="{tw * 0.15}"/>'
-    s += f'<rect x="{cx + tw * 0.08}" y="{top + hr * 2.6 + h * 0.33}" width="{tw * 0.3}" height="{h * 0.42}" rx="{tw * 0.15}"/>'
+        hc = _mix(SURF, TEXT, op * 1.2)
+        hy = head_y - head_r * 0.15
+        s += f'<path d="M{head_x - head_r * 1.08:.1f},{hy:.1f} A{head_r * 1.08:.1f},{head_r * 0.95:.1f} 0 0 1 {head_x + head_r * 1.08:.1f},{hy:.1f} Z" fill="{hc}"/>'
+        s += f'<rect x="{min(head_x - d * head_r * 1.05, head_x + d * head_r * 1.45):.1f}" y="{head_y - head_r * 0.2:.1f}" width="{head_r * 2.5:.1f}" height="{head_r * 0.22:.1f}" fill="{hc}"/>'
+    s += arm(phase, body) + leg(phase, body)
     return s + "</g>"
 
 
@@ -123,9 +166,9 @@ for i in range(9):
 for i in range(-9, 10):
     b += f'<line x1="800" y1="520" x2="{800 + i * 190}" y2="{H}" stroke="{LINE}" stroke-width="2"/>'
 b += f'<line x1="0" y1="520" x2="{W}" y2="520" stroke="{GOLD}" stroke-opacity=".5" stroke-width="2"/>'
-people = [(330, 820, 470, True, "compliant"), (700, 760, 380, False, "violation"), (1040, 640, 220, True, "far"), (1300, 800, 440, True, "compliant")]
-for cx, by, h, helmet, st in people:
-    b += person(cx, by, h, helmet)
+people = [(330, 820, 470, True, "compliant", 0.9, 1), (700, 760, 380, False, "violation", 2.4, -1), (1040, 640, 220, True, "far", 0.3, 1), (1300, 800, 440, True, "compliant", 4.0, -1)]
+for cx, by, h, helmet, st, ph, d in people:
+    b += person(cx, by, h, helmet, 0.55 if st != "far" else 0.4, ph, d)
     bw = h * 0.42
     x, y = cx - bw / 2, by - h - h * 0.04
     color = GOLD if st == "compliant" else AMBER
