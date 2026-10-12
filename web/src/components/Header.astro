@@ -28,7 +28,7 @@ if (hasPosts) nav.splice(4, 0, { href: localePath('/blog', locale), label: t('na
 
     <nav aria-label="Primary" class="hidden md:block">
       <ul class="flex items-center gap-6 text-sm text-muted">
-        {nav.map((n) => <li><a href={n.href} class="transition-colors hover:text-gold">{n.label}</a></li>)}
+        {nav.map((n) => <li><a href={n.href} class="nav-link transition-colors hover:text-gold">{n.label}</a></li>)}
         <li><a href={localePath('/cv', locale)} class="transition-colors hover:text-gold">{t('nav.cv')}</a></li>
       </ul>
     </nav>

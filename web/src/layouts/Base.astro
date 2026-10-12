@@ -83,18 +83,94 @@ const jsonLd = {
     </main>
     <Footer locale={locale} />
     <script>
-      // Subtle reveal-on-scroll for elements with .reveal
+      const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      // Number .stagger children so CSS can cascade them.
+      document.querySelectorAll('.stagger').forEach((el) =>
+        [...el.children].forEach((c, i) => (c as HTMLElement).style.setProperty('--i', String(i))),
+      );
+
+      // Reveal on scroll; items entering together cascade in reading order.
       const els = document.querySelectorAll('.reveal');
       if (!('IntersectionObserver' in window)) els.forEach((e) => e.classList.add('in'));
       else {
         const io = new IntersectionObserver(
-          (entries) => entries.forEach((en) => {
-            if (en.isIntersecting) { en.target.classList.add('in'); io.unobserve(en.target); }
-          }),
-          { rootMargin: '0px 0px -10% 0px' },
+          (entries) => {
+            entries
+              .filter((en) => en.isIntersecting)
+              .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top || a.boundingClientRect.left - b.boundingClientRect.left)
+              .forEach((en, i) => {
+                (en.target as HTMLElement).style.setProperty('--delay', `${Math.min(i, 6) * 90}ms`);
+                en.target.classList.add('in');
+                io.unobserve(en.target);
+              });
+          },
+          { rootMargin: '0px 0px -12% 0px' },
         );
         els.forEach((e) => io.observe(e));
       }
+
+      // Hero parallax, batched per frame.
+      const para = [...document.querySelectorAll<HTMLElement>('[data-parallax]')];
+      let ticking = false;
+      const onScroll = () => {
+        if (ticking) return;
+        ticking = true;
+        requestAnimationFrame(() => {
+          ticking = false;
+          if (reduced) return;
+          const y = scrollY;
+          const vh = innerHeight;
+          for (const el of para) {
+            if (y > vh * 1.2) continue;
+            const k = Number(el.dataset.parallax) || 0.1;
+            el.style.transform = `translate3d(0, ${y * k}px, 0)`;
+            el.style.opacity = String(Math.max(0, 1 - y / (vh * 0.9)));
+          }
+        });
+      };
+      addEventListener('scroll', onScroll, { passive: true });
+      onScroll();
+
+      // Highlight the nav link for the section in view.
+      const links = [...document.querySelectorAll<HTMLAnchorElement>('header .nav-link')];
+      const byId = new Map(links.map((a) => [new URL(a.href).hash.slice(1), a]));
+      const sections = [...byId.keys()].map((id) => document.getElementById(id)).filter(Boolean) as HTMLElement[];
+      if (sections.length && 'IntersectionObserver' in window) {
+        const spy = new IntersectionObserver(
+          (entries) => entries.forEach((en) => {
+            if (!en.isIntersecting) return;
+            links.forEach((l) => l.classList.remove('active'));
+            byId.get(en.target.id)?.classList.add('active');
+          }),
+          { rootMargin: '-45% 0px -50% 0px' },
+        );
+        sections.forEach((s) => spy.observe(s));
+      }
+
+      // When jumping to a section, pulse its heading once the scroll settles.
+      const arrive = (id: string) => {
+        const el = document.getElementById(id);
+        if (!el || reduced) return;
+        let done = false;
+        const fire = () => {
+          if (done) return;
+          done = true;
+          removeEventListener('scrollend', fire);
+          el.classList.remove('arrive');
+          void el.offsetWidth;
+          el.classList.add('arrive');
+          setTimeout(() => el.classList.remove('arrive'), 1300);
+        };
+        if ('onscrollend' in window) addEventListener('scrollend', fire, { once: true });
+        setTimeout(fire, 'onscrollend' in window ? 1500 : 700);
+      };
+      document.addEventListener('click', (e) => {
+        const a = (e.target as Element).closest?.('a[href*="#"]') as HTMLAnchorElement | null;
+        if (!a || a.pathname !== location.pathname) return;
+        const id = a.hash.slice(1);
+        if (id && id !== 'main') arrive(id);
+      });
     </script>
   </body>
 </html>
