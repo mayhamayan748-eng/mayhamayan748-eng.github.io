@@ -5,3 +5,6 @@ dist/
 __pycache__/
 *.db
 .env
+branding/qr-art.png
+branding/qr-card.png
+branding/qr-logo.png
