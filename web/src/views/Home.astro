@@ -228,6 +228,16 @@ const idx = () => String(++n).padStart(2, '0');
             </div>
           </div>
         )}
+        <div class="mt-6 flex flex-col items-center gap-6 rounded-2xl border border-line bg-surface p-6 sm:flex-row sm:items-center">
+          <img src={`${base}/qr/ayham-ayan-qr.webp`} alt={t('contact.qrAlt')} width="560" height="560" loading="lazy" class="size-44 shrink-0 rounded-xl sm:size-40" />
+          <div class="text-center sm:text-start">
+            <p class="font-mono text-xs uppercase tracking-wide text-gold">{t('contact.qrTitle')}</p>
+            <p class="mt-2 max-w-sm text-muted">{t('contact.qrText')}</p>
+            <a href={`${base}/qr/ayham-ayan-qr.jpg`} download="Ayham-Ayan-QR.jpg" class="mt-4 inline-flex h-10 items-center gap-2 rounded-lg border border-line px-4 text-sm font-medium transition-colors hover:border-gold hover:text-gold">
+              <Icon name="download" class="size-4" />{t('contact.qrDownload')}
+            </a>
+          </div>
+        </div>
       </div>
       <div class="lg:col-span-4">
         <p class="mb-3 font-mono text-xs uppercase tracking-wide text-gold">{t('contact.elsewhere')}</p>
