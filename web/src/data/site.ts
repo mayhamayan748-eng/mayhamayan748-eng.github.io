@@ -195,7 +195,7 @@ export const skills: SkillGroup[] = [
   {
     name: { en: 'Backend & Orchestration', ar: 'الخلفية والتنسيق' },
     items: [
-      { name: 'FastAPI', usedIn: ['document-ai-platform', 'ppe-compliance', 'camera-calibration'] },
+      { name: 'FastAPI', usedIn: ['document-ai-platform', 'ppe-compliance', 'camera-calibration', 'gan-faces'] },
       { name: 'Celery · Redis', usedIn: ['document-ai-platform', 'ppe-compliance', 'sam3-autolabel'] },
       { name: 'Temporal', usedIn: ['vlm-rule-extractor', 'guest-ops-copilot'] },
       { name: 'WebSocket', usedIn: ['ppe-compliance'] },
@@ -208,9 +208,9 @@ export const skills: SkillGroup[] = [
     name: { en: 'Infra & Tools', ar: 'البنية التحتية والأدوات' },
     items: [
       { name: 'NVIDIA DGX Spark (GB10)', usedIn: ['ppe-compliance', 'vlm-finetuning-lab'] },
-      { name: 'Docker / Compose', usedIn: ['document-ai-platform', 'ppe-compliance', 'camera-calibration'] },
+      { name: 'Docker / Compose', usedIn: ['document-ai-platform', 'ppe-compliance', 'camera-calibration', 'gan-faces'] },
       { name: 'GitLab CI · pytest', usedIn: ['camera-calibration', 'document-ai-platform'] },
-      { name: 'React · TypeScript', usedIn: ['ppe-compliance', 'camera-calibration', 'guest-ops-copilot'] },
+      { name: 'React · TypeScript', usedIn: ['ppe-compliance', 'camera-calibration', 'guest-ops-copilot', 'gan-faces'] },
       { name: 'PyQt6', usedIn: ['sam3-autolabel'] },
     ],
   },

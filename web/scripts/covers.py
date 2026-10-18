@@ -419,7 +419,7 @@ for r_ in range(3):
         b += f'<circle cx="{fx - 18}" cy="{ey}" r="5" fill="{TEXT}" opacity=".7"/><circle cx="{fx + 18}" cy="{ey}" r="5" fill="{TEXT}" opacity=".7"/>'
         b += f'<path d="M{fx - 16},{fy + 26} Q{fx},{fy + 26 + random.randint(-6, 10)} {fx + 16},{fy + 26}" fill="none" stroke="{TEXT}" stroke-opacity=".6" stroke-width="3" stroke-linecap="round"/>'
         b += f'<path d="M{fx - rw},{fy - 10} Q{fx},{fy - rh - random.randint(10, 30)} {fx + rw},{fy - 10}" fill="none" stroke="{GOLD}" stroke-opacity=".45" stroke-width="3"/>'
-b += text(1150, 820, "UTKFace · label smoothing vs mode collapse", 20, MUTED, "middle")
+b += text(1150, 820, "UTKFace · age-conditioned face generation", 20, MUTED, "middle")
 covers["gan-faces"] = frame(b, (0.6, 0.3))
 
 for slug, svg in covers.items():

@@ -3,34 +3,74 @@
   "featured": false,
   "nda": "none",
   "title": {
-    "en": "Face Generation with GANs",
-    "ar": "توليد الوجوه بشبكات GAN"
+    "en": "Deep Age Estimator: Age Prediction & Conditional GAN",
+    "ar": "مقدّر العمر العميق: تقدير العمر وتوليد الوجوه بشبكة GAN شرطية"
   },
   "summary": {
-    "en": "A GAN trained on UTKFace, with mode collapse fixed through label smoothing.",
-    "ar": "شبكة GAN مدرّبة على UTKFace، مع معالجة انهيار الأنماط عبر تنعيم التسميات."
+    "en": "Estimates age from a face photo (4.65-year test MAE) and generates faces of any age with a conditional GAN. Runs fully in the browser.",
+    "ar": "يقدّر العمر من صورة الوجه (متوسط خطأ 4.65 سنة على بيانات الاختبار) ويولّد وجوهاً بأي عمر عبر شبكة GAN شرطية، ويعمل بالكامل داخل المتصفح."
   },
   "problem": {
-    "en": "GAN training on faces tends to collapse to a few repeated outputs.",
-    "ar": "يميل تدريب شبكات GAN على الوجوه إلى الانهيار نحو عدد قليل من المخرجات المتكررة."
+    "en": "Age models trained on UTKFace regress towards the mean and generalise poorly to under-represented groups, including Middle Eastern faces, which the dataset does not label at all.",
+    "ar": "نماذج العمر المدرّبة على UTKFace تميل نحو المتوسط وتعمّم بشكل ضعيف على الفئات الأقل تمثيلاً، ومنها الوجوه الشرق أوسطية التي لا تصنّفها مجموعة البيانات أصلاً."
   },
   "approach": [
     {
-      "en": "CNN generator and discriminator in TensorFlow, trained on UTKFace.",
-      "ar": "مولّد ومميّز CNN في TensorFlow مدرّبان على UTKFace."
+      "en": "Trained a CNN, a CNN with conditional-GAN augmentation, and an EfficientNetB0 on UTKFace (23,621 faces). GAN-generated faces alone cut the CNN's error by 0.33 years.",
+      "ar": "تدريب CNN، وCNN مدعومة بوجوه مولّدة من GAN شرطية، وEfficientNetB0 على UTKFace (23,621 وجهاً). الوجوه المولّدة وحدها خفّضت خطأ الـ CNN بمقدار 0.33 سنة."
     },
     {
-      "en": "Label smoothing on the discriminator to stop mode collapse and recover output diversity.",
-      "ar": "تنعيم التسميات في المميّز لإيقاف انهيار الأنماط واستعادة تنوّع المخرجات."
+      "en": "Fine-tuned on FairFace with an interval loss for its age-range labels, halving out-of-range error on every ethnic group (4.55 → 2.32 years overall).",
+      "ar": "ضبط دقيق على FairFace بدالة خسارة للمجالات العمرية، فانخفض الخطأ خارج المجال إلى النصف تقريباً لكل الفئات العرقية (من 4.55 إلى 2.32 سنة إجمالاً)."
+    },
+    {
+      "en": "Inference-time gains without retraining: flip TTA, an 80/20 ensemble and isotonic calibration took the test MAE from 4.83 to 4.65 years.",
+      "ar": "تحسينات وقت الاستدلال دون إعادة تدريب: متوسط الصورة ومعكوسها، ودمج النماذج بنسبة 80/20، ومعايرة isotonic، فانخفض الخطأ من 4.83 إلى 4.65 سنة."
+    },
+    {
+      "en": "YuNet face detection with crop margins measured on 1,000 UTKFace images, so uploaded photos are framed like the training data.",
+      "ar": "كشف الوجوه بـ YuNet بهوامش قصّ مقاسة على 1,000 صورة من UTKFace، لتُؤطَّر الصور المرفوعة كصور التدريب."
+    },
+    {
+      "en": "Full web app (FastAPI + React, Docker), plus a serverless live demo: models exported to ONNX and run in the visitor's browser, matching the API's outputs exactly.",
+      "ar": "تطبيق ويب كامل (FastAPI وReact وDocker)، وعرض حي بلا خادم: النماذج مصدّرة إلى ONNX وتعمل داخل متصفح الزائر بنفس نتائج الـ API تماماً."
     }
   ],
-  "pipeline": [],
+  "pipeline": [
+    { "en": "Photo upload", "ar": "رفع الصورة" },
+    { "en": "YuNet face detection", "ar": "كشف الوجه بـ YuNet" },
+    { "en": "Calibrated crop + resize", "ar": "قصّ مُعاير وتحجيم" },
+    { "en": "EfficientNet + CNN-GAN ensemble", "ar": "دمج EfficientNet وCNN-GAN" },
+    { "en": "Isotonic calibration", "ar": "معايرة isotonic" },
+    { "en": "Age per face", "ar": "العمر لكل وجه" }
+  ],
   "stack": [
     "TensorFlow",
-    "CNN",
-    "GAN"
+    "EfficientNetB0",
+    "Conditional GAN",
+    "YuNet",
+    "ONNX Runtime Web",
+    "FastAPI",
+    "React",
+    "Docker"
   ],
-  "metrics": [],
+  "metrics": [
+    {
+      "label": { "en": "Test MAE (years)", "ar": "متوسط الخطأ بالسنوات (اختبار)" },
+      "value": "4.65",
+      "note": { "en": "ensemble + flip + calibration · UTKFace", "ar": "دمج + معكوس + معايرة · UTKFace" }
+    },
+    {
+      "label": { "en": "Diverse faces (years)", "ar": "وجوه متنوعة (بالسنوات)" },
+      "value": "4.55 → 2.32",
+      "note": { "en": "error outside the age range · FairFace test", "ar": "الخطأ خارج المجال العمري · اختبار FairFace" }
+    },
+    {
+      "label": { "en": "GAN augmentation (years)", "ar": "الإثراء بالـ GAN (بالسنوات)" },
+      "value": "−0.33",
+      "note": { "en": "same CNN, 6.16 → 5.83 MAE", "ar": "نفس الـ CNN، من 6.16 إلى 5.83" }
+    }
+  ],
   "media": [
     {
       "src": "/images/projects/gan-faces.webp",
@@ -39,5 +79,7 @@
         "ar": "رسم توضيحي: ضجيج يمرّ عبر المولّد إلى شبكة وجوه مجرّدة"
       }
     }
-  ]
+  ],
+  "repo": "https://github.com/mayhamayan748-eng/deep-age-estimator",
+  "demo": "https://ayhamayan-deep-age-estimator.static.hf.space"
 }
