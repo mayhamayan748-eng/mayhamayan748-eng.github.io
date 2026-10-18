@@ -78,7 +78,7 @@ const title = pick(p.title, locale);
             <div class="rounded-xl border border-line bg-surface p-4">
               <dt class="text-sm text-muted">{pick(m.label, locale)}</dt>
               <dd class="mt-1 font-mono text-2xl text-gold" title={m.value ? undefined : t('projects.pending')}>
-                {m.value ?? '—'}
+                <bdi dir="ltr">{m.value ?? '—'}</bdi>
               </dd>
               {m.note && <dd class="mt-1 text-xs text-muted">{pick(m.note, locale)}</dd>}
             </div>

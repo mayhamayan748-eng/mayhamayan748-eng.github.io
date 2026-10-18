@@ -33,7 +33,7 @@ const mediaCls = [
       <dl class="grid grid-cols-3 gap-3 pt-2">
         {p.metrics.slice(0, 3).map((m) => (
           <div>
-            <dd class="font-mono text-xl text-gold">{m.value ?? '—'}</dd>
+            <dd class="font-mono text-xl text-gold"><bdi dir="ltr">{m.value ?? '—'}</bdi></dd>
             <dt class="text-xs text-muted">{pick(m.label, locale)}</dt>
           </div>
         ))}
